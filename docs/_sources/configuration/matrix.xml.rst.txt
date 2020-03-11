@@ -1,0 +1,192 @@
+
+
+.. _module-services-matrix:
+
+Matrix
+------
+
+`Matrix <https://matrix.org/>`_ is an open standard for
+interoperable, decentralised, real-time communication over IP. It can be used
+to power Instant Messaging, VoIP/WebRTC signalling, Internet of Things
+communication - or anywhere you need a standard HTTP API for publishing and
+subscribing to data whilst tracking the conversation history.
+
+This chapter will show you how to set up your own, self-hosted Matrix
+homeserver using the Synapse reference homeserver, and how to serve your own
+copy of the Riot web client. See the
+`Try
+Matrix Now! <https://matrix.org/docs/projects/try-matrix-now.html>`_ overview page for links to Riot Apps for Android and iOS,
+desktop clients, as well as bridges to other networks and other projects
+around Matrix.
+
+.. _module-services-matrix-synapse:
+
+Synapse Homeserver
+~~~~~~~~~~~~~~~~~~
+
+`Synapse <https://github.com/matrix-org/synapse>`_ is
+the reference homeserver implementation of Matrix from the core development
+team at matrix.org. The following configuration example will set up a
+synapse server for the ``example.org`` domain, served from
+the host ``myhostname.example.org``. For more information,
+please refer to the
+`installation instructions of Synapse <https://github.com/matrix-org/synapse#synapse-installation>`_.
+
+::
+
+    let
+      fqdn =
+        let
+          join = hostName: domain: hostName + optionalString (domain != null) ".${domain}";
+        in join config.networking.hostName config.networking.domain;
+    in {
+      networking = {
+        hostName = "myhostname";
+        domain = "example.org";
+      };
+      networking.firewall.allowedTCPPorts = [ 80 443 ];
+
+      services.nginx = {
+        enable = true;
+        # only recommendedProxySettings and recommendedGzipSettings are strictly required,
+        # but the rest make sense as well
+        recommendedTlsSettings = true;
+        recommendedOptimisation = true;
+        recommendedGzipSettings = true;
+        recommendedProxySettings = true;
+
+        virtualHosts = {
+          # This host section can be placed on a different host than the rest,
+          # i.e. to delegate from the host being accessible as ${config.networking.domain}
+          # to another host actually running the Matrix homeserver.
+          "${config.networking.domain}" = {
+            locations."= /.well-known/matrix/server".extraConfig =
+              let
+                # use 443 instead of the default 8448 port to unite
+                # the client-server and server-server port for simplicity
+                server = { "m.server" = "${fqdn}:443"; };
+              in ''
+                add_header Content-Type application/json;
+                return 200 '${builtins.toJSON server}';
+              '';
+            locations."= /.well-known/matrix/client".extraConfig =
+              let
+                client = {
+                  "m.homeserver" =  { "base_url" = "https://${fqdn}"; };
+                  "m.identity_server" =  { "base_url" = "https://vector.im"; };
+                };
+              # ACAO required to allow riot-web on any URL to request this json file
+              in ''
+                add_header Content-Type application/json;
+                add_header Access-Control-Allow-Origin *;
+                return 200 '${builtins.toJSON client}';
+              '';
+          };
+
+          # Reverse proxy for Matrix client-server and server-server communication
+          ${fqdn} = {
+            enableACME = true;
+            forceSSL = true;
+
+            # Or do a redirect instead of the 404, or whatever is appropriate for you.
+            # But do not put a Matrix Web client here! See the Riot Web section below.
+            locations."/".extraConfig = ''
+              return 404;
+            '';
+
+            # forward all Matrix API calls to the synapse Matrix homeserver
+            locations."/_matrix" = {
+              proxyPass = "http://[::1]:8008"; # without a trailing /
+            };
+          };
+        };
+      };
+      services.matrix-synapse = {
+        enable = true;
+        server_name = config.networking.domain;
+        listeners = [
+          {
+            port = 8008;
+            bind_address = "::1";
+            type = "http";
+            tls = false;
+            x_forwarded = true;
+            resources = [
+              { names = [ "client" "federation" ]; compress = false; }
+            ];
+          }
+        ];
+      };
+    };
+
+If the A and AAAA DNS records on
+``example.org`` do not point on the same host as the records
+for myhostname.example.org, you can easily move the
+/.well-known virtualHost section of the code to the host that
+is serving ``example.org``, while the rest stays on
+``myhostname.example.org`` with no other changes required.
+This pattern also allows to seamlessly move the homeserver from
+``myhostname.example.org`` to
+``myotherhost.example.org`` by only changing the
+/.well-known redirection target.
+
+If you want to run a server with public registration by anybody, you can
+then enable . Otherwise, or you can generate a registration secret with
+:command:`pwgen -s 64 1` and set it with
+. To
+create a new user or admin, run the following after you have set the secret
+and have rebuilt NixOS:
+::
+
+    $ nix run nixpkgs.matrix-synapse$ register_new_matrix_user -k *your-registration-shared-secret* http://localhost:8008New user localpart: *your-username*Password: Confirm password: Make admin \[no]:
+    Success!
+
+In the example, this would create a user with the Matrix Identifier
+``@your-username:example.org``. Note that the registration
+secret ends up in the nix store and therefore is world-readable by any user
+on your machine, so it makes sense to only temporarily activate the
+option until a better solution
+for NixOS is in place.
+
+.. _module-services-matrix-riot-web:
+
+Riot Web Client
+~~~~~~~~~~~~~~~
+
+`Riot Web <https://github.com/vector-im/riot-web/>`_ is
+the reference web client for Matrix and developed by the core team at
+matrix.org. The following snippet can be optionally added to the code before
+to complete the synapse installation with a web client served at
+https://riot.myhostname.example.org and
+https://riot.example.org. Alternatively, you can use the hosted
+copy at `https://riot.im/app <https://riot.im/app>`_,
+or use other web clients or native client applications. Due to the
+``/.well-known`` urls set up done above, many clients should
+fill in the required connection details automatically when you enter your
+Matrix Identifier. See
+`Try
+Matrix Now! <https://matrix.org/docs/projects/try-matrix-now.html>`_ for a list of existing clients and their supported
+featureset.
+
+::
+
+    services.nginx.virtualHosts."riot.${fqdn}" = {
+      enableACME = true;
+      forceSSL = true;
+      serverAliases = [
+        "riot.${config.networking.domain}"
+      ];
+
+      root = pkgs.riot-web;
+    };
+
+Note that the Riot developers do not recommend running Riot and your Matrix
+homeserver on the same fully-qualified domain name for security reasons. In
+the example, this means that you should not reuse the
+``myhostname.example.org`` virtualHost to also serve Riot,
+but instead serve it on a different subdomain, like
+``riot.example.org`` in the example. See the
+`Riot
+Important Security Notes <https://github.com/vector-im/riot-web#important-security-note>`_ for more information on this subject.
+
+

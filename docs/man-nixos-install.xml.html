@@ -1,0 +1,257 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Description &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <p><strong class="command">nixos-install</strong>
+8
+NixOS</p>
+<p><strong class="command">nixos-install</strong>
+install bootloader and NixOS</p>
+<p>CMDSYN:  nixos-install –verbose -v –print-build-logs -L -I path –root root –system path –channel channel –no-channel-copy –no-root-passwd –no-bootloader –max-jobs -j number –cores number –option name value –show-trace –help</p>
+<div class="section" id="description">
+<h1>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
+<p>This command installs NixOS in the file system mounted on
+<code class="file docutils literal notranslate"><span class="pre">/mnt</span></code>, based on the NixOS configuration specified in
+<code class="file docutils literal notranslate"><span class="pre">/mnt/etc/nixos/configuration.nix</span></code>. It performs the
+following steps:</p>
+<ul class="simple">
+<li>It copies Nix and its dependencies to
+<code class="file docutils literal notranslate"><span class="pre">/mnt/nix/store</span></code>.</li>
+<li>It runs Nix in <code class="file docutils literal notranslate"><span class="pre">/mnt</span></code> to build the NixOS configuration
+specified in <code class="file docutils literal notranslate"><span class="pre">/mnt/etc/nixos/configuration.nix</span></code>.</li>
+<li>It installs the current channel nixos in the target channel
+profile (unless is specified).</li>
+<li>It installs the GRUB boot loader on the device specified in the option
+(unless
+is specified), and generates a GRUB
+configuration file that boots into the NixOS configuration just
+installed.</li>
+<li>It prompts you for a password for the root account (unless
+is specified).</li>
+</ul>
+<p>This command is idempotent: if it is interrupted or fails due to a temporary
+problem (e.g. a network issue), you can safely re-run it.</p>
+</div>
+<div class="section" id="options">
+<h1>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h1>
+<p>This command accepts the following options:</p>
+<div class="section" id="verbose">
+<span id="none"></span><h2>–verbose<a class="headerlink" href="#verbose" title="Permalink to this headline">¶</a></h2>
+<p>/ .. _None:</p>
+</div>
+<div class="section" id="v">
+<h2>-v<a class="headerlink" href="#v" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Increases the level of verbosity of diagnostic messages
+printed on standard error.  For each Nix operation, the information
+printed on standard output is well-defined; any diagnostic
+information is printed on standard error, never on standard
+output.</p>
+<p>Please note that this option may be specified repeatedly.</p>
+</div></blockquote>
+</div>
+<div class="section" id="print-build-logs">
+<span id="id1"></span><h2>–print-build-logs<a class="headerlink" href="#print-build-logs" title="Permalink to this headline">¶</a></h2>
+<p>/ .. _None:</p>
+</div>
+<div class="section" id="l">
+<h2>-L<a class="headerlink" href="#l" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Print the full build logs of <strong class="command">nix build</strong> to stderr.</div></blockquote>
+</div>
+<div class="section" id="root">
+<span id="id2"></span><h2>–root<a class="headerlink" href="#root" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Defaults to <code class="file docutils literal notranslate"><span class="pre">/mnt</span></code>. If this option is given, treat the
+directory <em>root</em> as the root of the NixOS
+installation.</div></blockquote>
+</div>
+<div class="section" id="system">
+<span id="id3"></span><h2>–system<a class="headerlink" href="#system" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>If this option is provided, <strong class="command">nixos-install</strong> will install
+the specified closure rather than attempt to build one from
+<code class="file docutils literal notranslate"><span class="pre">/mnt/etc/nixos/configuration.nix</span></code>.</p>
+<p>The closure must be an appropriately configured NixOS system, with boot
+loader and partition configuration that fits the target host. Such a
+closure is typically obtained with a command such as <strong class="command">nix-build
+-I nixos-config=./configuration.nix '&lt;nixpkgs/nixos&gt;' -A system
+--no-out-link</strong></p>
+</div></blockquote>
+</div>
+<div class="section" id="channel">
+<span id="id4"></span><h2>–channel<a class="headerlink" href="#channel" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>If this option is provided, do not copy the current
+nixos channel to the target host. Instead, use the
+specified derivation.</div></blockquote>
+</div>
+<div class="section" id="i">
+<span id="id5"></span><h2>-I<a class="headerlink" href="#i" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Add a path to the Nix expression search path. This option may be given
+multiple times. See the NIX_PATH environment variable for information on
+the semantics of the Nix search path. Paths added through
+<em>-I</em> take precedence over NIX_PATH.</div></blockquote>
+<p id="id6">–max-jobs
+__________, .. _None:</p>
+</div>
+<div class="section" id="j">
+<h2>-j<a class="headerlink" href="#j" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Sets the maximum number of build jobs that Nix will perform in parallel
+to the specified number. The default is <code class="docutils literal notranslate"><span class="pre">1</span></code>. A higher
+value is useful on SMP systems or to exploit I/O latency.</div></blockquote>
+</div>
+<div class="section" id="cores">
+<span id="id7"></span><h2>–cores<a class="headerlink" href="#cores" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Sets the value of the NIX_BUILD_CORES environment variable
+in the invocation of builders. Builders can use this variable at their
+discretion to control the maximum amount of parallelism. For instance, in
+Nixpkgs, if the derivation attribute
+<code class="docutils literal notranslate"><span class="pre">enableParallelBuilding</span></code> is set to
+<code class="docutils literal notranslate"><span class="pre">true</span></code>, the builder passes the
+flag to GNU Make. The
+value <code class="docutils literal notranslate"><span class="pre">0</span></code> means that the builder should use all
+available CPU cores in the system.</div></blockquote>
+</div>
+<div class="section" id="option">
+<span id="id8"></span><h2>–option<a class="headerlink" href="#option" title="Permalink to this headline">¶</a></h2>
+<p><em>name</em> <em>value</em></p>
+<blockquote>
+<div>Set the Nix configuration option <em>name</em> to
+<em>value</em>.</div></blockquote>
+</div>
+<div class="section" id="show-trace">
+<span id="id9"></span><h2>–show-trace<a class="headerlink" href="#show-trace" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Causes Nix to print out a stack trace in case of Nix expression
+evaluation errors.</div></blockquote>
+</div>
+<div class="section" id="help">
+<span id="id10"></span><h2>–help<a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Synonym for <strong class="command">man nixos-install</strong>.</div></blockquote>
+</div>
+</div>
+<div class="section" id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<p>A typical NixOS installation is done by creating and mounting a file system
+on <code class="file docutils literal notranslate"><span class="pre">/mnt</span></code>, generating a NixOS configuration in
+<code class="file docutils literal notranslate"><span class="pre">/mnt/etc/nixos/configuration.nix</span></code>, and running
+<strong class="command">nixos-install</strong>. For instance, if we want to install NixOS
+on an <code class="docutils literal notranslate"><span class="pre">ext4</span></code> file system created in
+<code class="file docutils literal notranslate"><span class="pre">/dev/sda1</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkfs.ext4 /dev/sda1$ mount /dev/sda1 /mnt$ nixos-generate-config --root /mnt$ # edit /mnt/etc/nixos/configuration.nix$ nixos-install$ reboot
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/man-nixos-install.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

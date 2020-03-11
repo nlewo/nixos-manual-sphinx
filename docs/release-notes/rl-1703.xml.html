@@ -1,0 +1,412 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Release 17.03 (“Gorilla”, 2017/03/31) &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="release-17-03-gorilla-2017-03-31">
+<span id="sec-release-17-03"></span><h1>Release 17.03 (“Gorilla”, 2017/03/31)<a class="headerlink" href="#release-17-03-gorilla-2017-03-31" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="highlights">
+<span id="sec-release-17-03-highlights"></span><h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<p>In addition to numerous new and upgraded packages, this release has the
+following highlights:</p>
+<ul class="simple">
+<li>Nixpkgs is now extensible through overlays. See the
+<a class="reference external" href="https://nixos.org/nixpkgs/manual/#sec-overlays-install">Nixpkgs
+manual</a> for more information.</li>
+<li>This release is based on Glibc 2.25, GCC 5.4.0 and systemd 232. The
+default Linux kernel is 4.9 and Nix is at 1.11.8.</li>
+<li>The default desktop environment now is KDE’s Plasma 5. KDE 4 has been
+removed</li>
+<li>The setuid wrapper functionality now supports setting capabilities.</li>
+<li>X.org server uses branch 1.19. Due to ABI incompatibilities,
+<code class="docutils literal notranslate"><span class="pre">ati_unfree</span></code> keeps forcing 1.17 and
+<code class="docutils literal notranslate"><span class="pre">amdgpu-pro</span></code> starts forcing 1.18.</li>
+<li>Cross compilation has been rewritten. See the nixpkgs manual for details.
+The most obvious breaking change is that in derivations there is no
+<code class="docutils literal notranslate"><span class="pre">.nativeDrv</span></code> nor <code class="docutils literal notranslate"><span class="pre">.crossDrv</span></code> are now
+cross by default, not native.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">overridePackages</span></code> function has been rewritten to be
+replaced by
+<a class="reference external" href="https://nixos.org/nixpkgs/manual/#sec-overlays-install">overlays</a></li>
+<li>Packages in nixpkgs can be marked as insecure through listed
+vulnerabilities. See the
+<a class="reference external" href="https://nixos.org/nixpkgs/manual/#sec-allow-insecure">Nixpkgs
+manual</a> for more information.</li>
+<li>PHP now defaults to PHP 7.1</li>
+</ul>
+</div>
+<div class="section" id="new-services">
+<span id="sec-release-17-03-new-services"></span><h1>New Services<a class="headerlink" href="#new-services" title="Permalink to this headline">¶</a></h1>
+<p>The following new services were added since the last release:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">hardware/ckb.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">hardware/mcelog.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">hardware/usb-wwan.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">hardware/video/capture/mwprocapture.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">programs/adb.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">programs/chromium.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">programs/gphoto2.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">programs/java.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">programs/mtr.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">programs/oblogout.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">programs/vim.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">programs/wireshark.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">security/dhparams.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/audio/ympd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/computing/boinc/client.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/continuous-integration/buildbot/master.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/continuous-integration/buildbot/worker.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/continuous-integration/gitlab-runner.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/databases/riak-cs.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/databases/stanchion.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/desktops/gnome3/gnome-terminal-server.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/editors/infinoted.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/hardware/illum.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/hardware/trezord.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/logging/journalbeat.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/mail/offlineimap.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/mail/postgrey.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/couchpotato.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/docker-registry.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/errbot.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/geoip-updater.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/gogs.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/leaps.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/nix-optimise.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/ssm-agent.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/sssd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/arbtt.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/netdata.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/prometheus/default.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/prometheus/alertmanager.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/prometheus/blackbox-exporter.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/prometheus/json-exporter.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/prometheus/nginx-exporter.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/prometheus/node-exporter.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/prometheus/snmp-exporter.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/prometheus/unifi-exporter.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/prometheus/varnish-exporter.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/sysstat.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/telegraf.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/vnstat.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/network-filesystems/cachefilesd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/network-filesystems/glusterfs.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/network-filesystems/ipfs.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/dante.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/dnscrypt-wrapper.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/fakeroute.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/flannel.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/htpdate.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/miredo.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/nftables.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/powerdns.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/pdns-recursor.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/quagga.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/redsocks.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/wireguard.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/system/cgmanager.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/torrent/opentracker.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/web-apps/atlassian/confluence.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/web-apps/atlassian/crowd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/web-apps/atlassian/jira.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/web-apps/frab.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/web-apps/nixbot.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/web-apps/selfoss.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/web-apps/quassel-webserver.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/x11/unclutter-xfixes.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/x11/urxvtd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">system/boot/systemd-nspawn.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">virtualisation/ecs-agent.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">virtualisation/lxcfs.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">virtualisation/openstack/keystone.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">virtualisation/openstack/glance.nix</span></code></li>
+</ul>
+</div>
+<div class="section" id="backward-incompatibilities">
+<span id="sec-release-17-03-incompatibilities"></span><h1>Backward Incompatibilities<a class="headerlink" href="#backward-incompatibilities" title="Permalink to this headline">¶</a></h1>
+<p>When upgrading from a previous release, please be aware of the following
+incompatible changes:</p>
+<ul>
+<li><p class="first">Derivations have no <code class="docutils literal notranslate"><span class="pre">.nativeDrv</span></code> nor
+<code class="docutils literal notranslate"><span class="pre">.crossDrv</span></code> and are now cross by default, not native.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">stdenv.overrides</span></code> is now expected to take
+<code class="docutils literal notranslate"><span class="pre">self</span></code> and <code class="docutils literal notranslate"><span class="pre">super</span></code> arguments. See
+<code class="docutils literal notranslate"><span class="pre">lib.trivial.extends</span></code> for what those parameters
+represent.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">ansible</span></code> now defaults to ansible version 2 as version 1
+has been removed due to a serious
+<a class="reference external" href="https://www.computest.nl/advisories/CT-2017-0109_Ansible.txt">vulnerability</a> unpatched by upstream.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">gnome</span></code> alias has been removed along with
+<code class="docutils literal notranslate"><span class="pre">gtk</span></code>, <code class="docutils literal notranslate"><span class="pre">gtkmm</span></code> and several others. Now
+you need to use versioned attributes, like <code class="docutils literal notranslate"><span class="pre">gnome3</span></code>.</p>
+</li>
+<li><p class="first">The attribute name of the Radicale daemon has been changed from
+<code class="docutils literal notranslate"><span class="pre">pythonPackages.radicale</span></code> to <code class="docutils literal notranslate"><span class="pre">radicale</span></code>.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">stripHash</span></code> bash function in
+<code class="docutils literal notranslate"><span class="pre">stdenv</span></code> changed according to its documentation; it now
+outputs the stripped name to <code class="docutils literal notranslate"><span class="pre">stdout</span></code> instead of putting
+it in the variable <code class="docutils literal notranslate"><span class="pre">strippedName</span></code>.</p>
+</li>
+<li><p class="first">PHP now scans for extra configuration .ini files in /etc/php.d instead of
+/etc. This prevents accidentally loading non-PHP .ini files that may be in
+/etc.</p>
+</li>
+<li><p class="first">Two lone top-level dict dbs moved into <code class="docutils literal notranslate"><span class="pre">dictdDBs</span></code>. This
+affects: <code class="docutils literal notranslate"><span class="pre">dictdWordnet</span></code> which is now at
+<code class="docutils literal notranslate"><span class="pre">dictdDBs.wordnet</span></code> and <code class="docutils literal notranslate"><span class="pre">dictdWiktionary</span></code>
+which is now at <code class="docutils literal notranslate"><span class="pre">dictdDBs.wiktionary</span></code></p>
+</li>
+<li><p class="first">Parsoid service now uses YAML configuration format.
+<code class="docutils literal notranslate"><span class="pre">service.parsoid.interwikis</span></code> is now called
+<code class="docutils literal notranslate"><span class="pre">service.parsoid.wikis</span></code> and is a list of either API URLs
+or attribute sets as specified in parsoid’s documentation.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">Ntpd</span></code> was replaced by
+<code class="docutils literal notranslate"><span class="pre">systemd-timesyncd</span></code> as the default service to synchronize
+system time with a remote NTP server. The old behavior can be restored by
+setting <code class="docutils literal notranslate"><span class="pre">services.ntp.enable</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code>.
+Upstream time servers for all NTP implementations are now configured using
+<code class="docutils literal notranslate"><span class="pre">networking.timeServers</span></code>.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">service.nylon</span></code> is now declared using named instances. As
+an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">services</span><span class="o">.</span><span class="n">nylon</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">enable</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+  <span class="n">acceptInterface</span> <span class="o">=</span> <span class="s2">&quot;br0&quot;</span><span class="p">;</span>
+  <span class="n">bindInterface</span> <span class="o">=</span> <span class="s2">&quot;tun1&quot;</span><span class="p">;</span>
+  <span class="n">port</span> <span class="o">=</span> <span class="mi">5912</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>should be replaced with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">services</span><span class="o">.</span><span class="n">nylon</span><span class="o">.</span><span class="n">myvpn</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">enable</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+  <span class="n">acceptInterface</span> <span class="o">=</span> <span class="s2">&quot;br0&quot;</span><span class="p">;</span>
+  <span class="n">bindInterface</span> <span class="o">=</span> <span class="s2">&quot;tun1&quot;</span><span class="p">;</span>
+  <span class="n">port</span> <span class="o">=</span> <span class="mi">5912</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>this enables you to declare a SOCKS proxy for each uplink.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">overridePackages</span></code> function no longer exists. It is
+replaced by
+<a class="reference external" href="https://nixos.org/nixpkgs/manual/#sec-overlays-install">overlays</a>. For example, the following code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">let</span>
+  <span class="n">pkgs</span> <span class="o">=</span> <span class="kn">import</span> <span class="o">&lt;</span><span class="n">nixpkgs</span><span class="o">&gt;</span> <span class="p">{};</span>
+<span class="ow">in</span>
+  <span class="n">pkgs</span><span class="o">.</span><span class="n">overridePackages</span> <span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="nb">super</span><span class="p">:</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>should be replaced by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">let</span>
+  <span class="n">pkgs</span> <span class="o">=</span> <span class="kn">import</span> <span class="o">&lt;</span><span class="n">nixpkgs</span><span class="o">&gt;</span> <span class="p">{};</span>
+<span class="ow">in</span>
+  <span class="kn">import</span> <span class="nn">pkgs.path</span> <span class="p">{</span> <span class="n">overlays</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="p">:</span> <span class="nb">super</span><span class="p">:</span> <span class="o">...</span><span class="p">)];</span> <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Autoloading connection tracking helpers is now disabled by default. This
+default was also changed in the Linux kernel and is considered insecure if
+not configured properly in your firewall. If you need connection tracking
+helpers (i.e. for active FTP) please enable
+<code class="docutils literal notranslate"><span class="pre">networking.firewall.autoLoadConntrackHelpers</span></code> and tune
+<code class="docutils literal notranslate"><span class="pre">networking.firewall.connectionTrackingModules</span></code> to suit
+your needs.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">local_recipient_maps</span></code> is not set to empty value by
+Postfix service. It’s an insecure default as stated by Postfix
+documentation. Those who want to retain this setting need to set it via
+<code class="docutils literal notranslate"><span class="pre">services.postfix.extraConfig</span></code>.</p>
+</li>
+<li><p class="first">Iputils no longer provide ping6 and traceroute6. The functionality of
+these tools has been integrated into ping and traceroute respectively. To
+enforce an address family the new flags <code class="docutils literal notranslate"><span class="pre">-4</span></code> and
+<code class="docutils literal notranslate"><span class="pre">-6</span></code> have been added. One notable incompatibility is that
+specifying an interface (for link-local IPv6 for instance) is no longer
+done with the <code class="docutils literal notranslate"><span class="pre">-I</span></code> flag, but by encoding the interface
+into the address (<code class="docutils literal notranslate"><span class="pre">ping</span> <span class="pre">fe80::1%eth0</span></code>).</p>
+</li>
+<li><p class="first">The socket handling of the <code class="docutils literal notranslate"><span class="pre">services.rmilter</span></code> module has
+been fixed and refactored. As rmilter doesn’t support binding to more than
+one socket, the options <code class="docutils literal notranslate"><span class="pre">bindUnixSockets</span></code> and
+<code class="docutils literal notranslate"><span class="pre">bindInetSockets</span></code> have been replaced by
+<code class="docutils literal notranslate"><span class="pre">services.rmilter.bindSocket.*</span></code>. The default is still a
+unix socket in <code class="docutils literal notranslate"><span class="pre">/run/rmilter/rmilter.sock</span></code>. Refer to the
+options documentation for more information.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">fetch*</span></code> functions no longer support md5, please use
+sha256 instead.</p>
+</li>
+<li><p class="first">The dnscrypt-proxy module interface has been streamlined around the
+option. Where possible, legacy option
+declarations are mapped to but will emit
+warnings. The has been outright removed: to
+use an unlisted resolver, use the option.</p>
+</li>
+<li><p class="first">torbrowser now stores local state under
+<code class="file docutils literal notranslate"><span class="pre">~/.local/share/tor-browser</span></code> by default. Any browser
+profile data from the old location, <code class="file docutils literal notranslate"><span class="pre">~/.torbrowser4</span></code>,
+must be migrated manually.</p>
+</li>
+<li><p class="first">The ihaskell, monetdb, offlineimap and sitecopy services have been
+removed.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="other-notable-changes">
+<span id="sec-release-17-03-notable-changes"></span><h1>Other Notable Changes<a class="headerlink" href="#other-notable-changes" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Module type system have a new extensible option types feature that allow
+to extend certain types, such as enum, through multiple option
+declarations of the same option across multiple modules.</li>
+<li><code class="docutils literal notranslate"><span class="pre">jre</span></code> now defaults to GTK UI by default. This improves
+visual consistency and makes Java follow system font style, improving the
+situation on HighDPI displays. This has a cost of increased closure size;
+for server and other headless workloads it’s recommended to use
+<code class="docutils literal notranslate"><span class="pre">jre_headless</span></code>.</li>
+<li>Python 2.6 interpreter and package set have been removed.</li>
+<li>The Python 2.7 interpreter does not use modules anymore. Instead, all
+CPython interpreters now include the whole standard library except for
+`tkinter`, which is available in the Python package set.</li>
+<li>Python 2.7, 3.5 and 3.6 are now built deterministically and 3.4 mostly.
+Minor modifications had to be made to the interpreters in order to
+generate deterministic bytecode. This has security implications and is
+relevant for those using Python in a <code class="docutils literal notranslate"><span class="pre">nix-shell</span></code>. See the
+Nixpkgs manual for details.</li>
+<li>The Python package sets now use a fixed-point combinator and the sets are
+available as attributes of the interpreters.</li>
+<li>The Python function <code class="docutils literal notranslate"><span class="pre">buildPythonPackage</span></code> has been
+improved and can be used to build from Setuptools source, Flit source, and
+precompiled Wheels.</li>
+<li>When adding new or updating current Python libraries, the expressions
+should be put in separate files in
+<code class="docutils literal notranslate"><span class="pre">pkgs/development/python-modules</span></code> and called from
+<code class="docutils literal notranslate"><span class="pre">python-packages.nix</span></code>.</li>
+<li>The dnscrypt-proxy service supports synchronizing the list of public
+resolvers without working DNS resolution. This fixes issues caused by the
+resolver list becoming outdated. It also improves the viability of
+DNSCrypt only configurations.</li>
+<li>Containers using bridged networking no longer lose their connection after
+changes to the host networking.</li>
+<li>ZFS supports pool auto scrubbing.</li>
+<li>The bind DNS utilities (e.g. dig) have been split into their own output
+and are now also available in <code class="docutils literal notranslate"><span class="pre">pkgs.dnsutils</span></code> and it is
+no longer necessary to pull in all of <code class="docutils literal notranslate"><span class="pre">bind</span></code> to use them.</li>
+<li>Per-user configuration was moved from <code class="file docutils literal notranslate"><span class="pre">~/.nixpkgs</span></code> to
+<code class="file docutils literal notranslate"><span class="pre">~/.config/nixpkgs</span></code>. The former is still valid for
+<code class="file docutils literal notranslate"><span class="pre">config.nix</span></code> for backwards compatibility.</li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/release-notes/rl-1703.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

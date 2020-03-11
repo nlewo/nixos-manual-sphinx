@@ -1,0 +1,249 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Modularity &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Syntax Summary" href="summary.xml.html" />
+    <link rel="prev" title="Abstractions" href="abstractions.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="modularity">
+<span id="sec-modularity"></span><h1>Modularity<a class="headerlink" href="#modularity" title="Permalink to this headline">¶</a></h1>
+<p>The NixOS configuration mechanism is modular. If your
+<code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code> becomes too big, you can split it into
+multiple files. Likewise, if you have multiple NixOS configurations (e.g. for
+different computers) with some commonality, you can move the common
+configuration into a shared file.</p>
+<p>Modules have exactly the same syntax as
+<code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code>. In fact,
+<code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code> is itself a module. You can use other
+modules by including them from <code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code>, e.g.:</p>
+<pre class="literal-block">
+{ config, pkgs, ... }:
+
+{ imports = [ ./vpn.nix ./kde.nix ];
+  <a class="reference internal" href="../generated/options-db.xml.html#opt-services-httpd-enable"><span class="std std-ref">services.httpd.enable</span></a>  = true;
+  <a class="reference internal" href="../generated/options-db.xml.html#opt-environment-systempackages"><span class="std std-ref">environment.systemPackages</span></a>  = [ pkgs.emacs ];
+  <em>...</em>
+}
+</pre>
+<p>Here, we include two modules from the same directory,
+<code class="file docutils literal notranslate"><span class="pre">vpn.nix</span></code> and <code class="file docutils literal notranslate"><span class="pre">kde.nix</span></code>. The latter
+might look like this:</p>
+<pre class="literal-block">
+{ config, pkgs, ... }:
+
+{ <a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-enable"><span class="std std-ref">services.xserver.enable</span></a>  = true;
+  <a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-displaymanager-sddm-enable"><span class="std std-ref">services.xserver.displayManager.sddm.enable</span></a>  = true;
+  <a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-desktopmanager-plasma5-enable"><span class="std std-ref">services.xserver.desktopManager.plasma5.enable</span></a>  = true;
+}
+</pre>
+<p>Note that both <code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code> and
+<code class="file docutils literal notranslate"><span class="pre">kde.nix</span></code> define the option
+<a class="reference internal" href="../generated/options-db.xml.html#opt-environment-systempackages"><span class="std std-ref">environment.systemPackages</span></a>. When multiple modules
+define an option, NixOS will try to <em>merge</em> the
+definitions. In the case of <a class="reference internal" href="../generated/options-db.xml.html#opt-environment-systempackages"><span class="std std-ref">environment.systemPackages</span></a>,
+that’s easy: the lists of packages can simply be concatenated. The value in
+<code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code> is merged last, so for list-type
+options, it will appear at the end of the merged list. If you want it to
+appear first, you can use <code class="docutils literal notranslate"><span class="pre">mkBefore</span></code>:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-boot-kernelmodules"><span class="std std-ref">boot.kernelModules</span></a>  = mkBefore [ &quot;kvm-intel&quot; ];
+</pre>
+<p>This causes the <code class="docutils literal notranslate"><span class="pre">kvm-intel</span></code> kernel module to be loaded
+before any other kernel modules.</p>
+<p>For other types of options, a merge may not be possible. For instance, if two
+modules define <a class="reference internal" href="../generated/options-db.xml.html#opt-services-httpd-adminaddr"><span class="std std-ref">services.httpd.adminAddr</span></a>,
+<strong class="command">nixos-rebuild</strong> will give an error:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>The unique option \`services.httpd.adminAddr&#39; is defined multiple times, in \`/etc/nixos/httpd.nix&#39; and \`/etc/nixos/configuration.nix&#39;.
+</pre></div>
+</div>
+<p>When that happens, it’s possible to force one definition take precedence
+over the others:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-httpd-adminaddr"><span class="std std-ref">services.httpd.adminAddr</span></a>  = pkgs.lib.mkForce &quot;<a class="reference external" href="mailto:bob&#37;&#52;&#48;example&#46;org">bob<span>&#64;</span>example<span>&#46;</span>org</a>&quot;;
+</pre>
+<p>When using multiple modules, you may need to access configuration values
+defined in other modules. This is what the <code class="docutils literal notranslate"><span class="pre">config</span></code> function
+argument is for: it contains the complete, merged system configuration. That
+is, <code class="docutils literal notranslate"><span class="pre">config</span></code> is the result of combining the configurations
+returned by every module</p>
+<p>If you’re wondering how it’s possible that the (indirect)
+<em>result</em> of a function is passed as an
+<em>input</em> to that same function: that’s because Nix is a
+“lazy” language — it only computes values when they are needed. This
+works as long as no individual configuration value depends on itself.</p>
+<p>. For example, here is a module that adds some packages to
+<a class="reference internal" href="../generated/options-db.xml.html#opt-environment-systempackages"><span class="std std-ref">environment.systemPackages</span></a> only if
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-enable"><span class="std std-ref">services.xserver.enable</span></a> is set to
+<code class="docutils literal notranslate"><span class="pre">true</span></code> somewhere else:</p>
+<pre class="literal-block">
+{ config, pkgs, ... }:
+
+{ <a class="reference internal" href="../generated/options-db.xml.html#opt-environment-systempackages"><span class="std std-ref">environment.systemPackages</span></a>  =
+    if config.:ref:<cite>opt-services.xserver.enable</cite>  then
+      [ pkgs.firefox
+        pkgs.thunderbird
+      ]
+    else
+      [ ];
+}
+</pre>
+<p>With multiple modules, it may not be obvious what the final value of a
+configuration option is. The command allows you
+to find out:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nixos-option :ref:`opt-services.xserver.enable`
+true
+$ nixos-option :ref:`opt-boot.kernelModules`
+[ &quot;tun&quot; &quot;ipv6&quot; &quot;loop&quot; *...* ]
+</pre></div>
+</div>
+<p>Interactive exploration of the configuration is possible using <strong class="command">nix
+repl</strong>, a read-eval-print loop for Nix expressions. A typical use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix repl &#39;&lt;nixpkgs/nixos&gt;&#39;
+nix-repl&gt; config.:ref:`opt-networking.hostName`
+&quot;mandark&quot;
+nix-repl&gt; map (x: x.hostName) config.:ref:`opt-services.httpd.virtualHosts`
+[ &quot;example.org&quot; &quot;example.gov&quot; ]
+</pre></div>
+</div>
+<p>While abstracting your configuration, you may find it useful to generate
+modules using code, instead of writing files. The example below would have
+the same effect as importing a file which sets those options.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="n">config</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">,</span> <span class="o">...</span> <span class="p">}:</span>
+
+<span class="n">let</span> <span class="n">netConfig</span> <span class="o">=</span> <span class="p">{</span> <span class="n">hostName</span> <span class="p">}:</span> <span class="p">{</span>
+  <span class="n">networking</span><span class="o">.</span><span class="n">hostName</span> <span class="o">=</span> <span class="n">hostName</span><span class="p">;</span>
+  <span class="n">networking</span><span class="o">.</span><span class="n">useDHCP</span> <span class="o">=</span> <span class="n">false</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="ow">in</span>
+
+<span class="p">{</span> <span class="n">imports</span> <span class="o">=</span> <span class="p">[</span> <span class="p">(</span><span class="n">netConfig</span> <span class="s2">&quot;nixos.localdomain&quot;</span><span class="p">)</span> <span class="p">];</span> <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="configuration.xml.html">Configuration</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="config-syntax.xml.html">Configuration Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="package-mgmt.xml.html">Package Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-mgmt.xml.html">User Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file-systems.xml.html">File Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="x-windows.xml.html">X Window System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xfce.xml.html">Xfce Desktop Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="networking.xml.html">Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linux-kernel.xml.html">Linux Kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix.xml.html">Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profiles.xml.html">Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kubernetes.xml.html">Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="configuration.xml.html">Configuration</a><ul>
+  <li><a href="config-syntax.xml.html">Configuration Syntax</a><ul>
+      <li>Previous: <a href="abstractions.xml.html" title="previous chapter">Abstractions</a></li>
+      <li>Next: <a href="summary.xml.html" title="next chapter">Syntax Summary</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/configuration/modularity.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

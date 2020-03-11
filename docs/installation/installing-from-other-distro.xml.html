@@ -1,0 +1,357 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Installing from another Linux distribution &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Installing behind a proxy" href="installing-behind-a-proxy.xml.html" />
+    <link rel="prev" title="Installing in a VirtualBox guest" href="installing-virtualbox-guest.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="installing-from-another-linux-distribution">
+<span id="sec-installing-from-other-distro"></span><h1>Installing from another Linux distribution<a class="headerlink" href="#installing-from-another-linux-distribution" title="Permalink to this headline">¶</a></h1>
+<p>Because Nix (the package manager) &amp; Nixpkgs (the Nix packages collection)
+can both be installed on any (most?) Linux distributions, they can be used to
+install NixOS in various creative ways. You can, for instance:</p>
+<ol class="arabic simple">
+<li>Install NixOS on another partition, from your existing Linux distribution
+(without the use of a USB or optical device!)</li>
+<li>Install NixOS on the same partition (in place!), from your existing
+non-NixOS Linux distribution using <code class="docutils literal notranslate"><span class="pre">NIXOS_LUSTRATE</span></code>.</li>
+<li>Install NixOS on your hard drive from the Live CD of any Linux
+distribution.</li>
+</ol>
+<p>The first steps to all these are the same:</p>
+<ol class="arabic">
+<li><p class="first">Install the Nix package manager:</p>
+<p>Short version:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ curl https://nixos.org/nix/install | sh$ . $HOME/.nix-profile/etc/profile.d/nix.sh # …or open a fresh shell
+</pre></div>
+</div>
+<p>More details in the
+<a class="reference external" href="https://nixos.org/nix/manual/#chap-quick-start">Nix manual</a></p>
+</li>
+<li><p class="first">Switch to the NixOS channel:</p>
+<p>If you’ve just installed Nix on a non-NixOS distribution, you will be on
+the <code class="docutils literal notranslate"><span class="pre">nixpkgs</span></code> channel by default.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-channel --list
+nixpkgs https://nixos.org/channels/nixpkgs-unstable
+</pre></div>
+</div>
+<p>As that channel gets released without running the NixOS tests, it will be
+safer to use the <code class="docutils literal notranslate"><span class="pre">nixos-*</span></code> channels instead:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-channel --add https://nixos.org/channels/nixos-*version* nixpkgs
+</pre></div>
+</div>
+<p>You may want to throw in a <code class="docutils literal notranslate"><span class="pre">nix-channel</span> <span class="pre">--update</span></code> for good
+measure.</p>
+</li>
+<li><p class="first">Install the NixOS installation tools:</p>
+<p>You’ll need <code class="docutils literal notranslate"><span class="pre">nixos-generate-config</span></code> and
+<code class="docutils literal notranslate"><span class="pre">nixos-install</span></code> and we’ll throw in some man pages and
+<code class="docutils literal notranslate"><span class="pre">nixos-enter</span></code> just in case you want to chroot into your
+NixOS partition. They are installed by default on NixOS, but you don’t have
+NixOS yet..</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-env -iE &quot;_: with import &lt;nixpkgs/nixos&gt; { configuration = {}; }; with config.system.build; [ nixos-generate-config nixos-install nixos-enter manual.manpages ]&quot;
+</pre></div>
+</div>
+</li>
+<li><div class="first admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The following 5 steps are only for installing NixOS to another partition.
+For installing NixOS in place using <code class="docutils literal notranslate"><span class="pre">NIXOS_LUSTRATE</span></code>,
+skip ahead.</p>
+</div>
+<p>Prepare your target partition:</p>
+<p>At this point it is time to prepare your target partition. Please refer to
+the partitioning, file-system creation, and mounting steps of
+<a class="reference internal" href="installing.xml.html#sec-installation"><span class="std std-ref">Installing NixOS</span></a></p>
+<p>If you’re about to install NixOS in place using
+<code class="docutils literal notranslate"><span class="pre">NIXOS_LUSTRATE</span></code> there is nothing to do for this step.</p>
+</li>
+<li><p class="first">Generate your NixOS configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo \`which nixos-generate-config` --root /mnt
+</pre></div>
+</div>
+<p>You’ll probably want to edit the configuration files. Refer to the
+<code class="docutils literal notranslate"><span class="pre">nixos-generate-config</span></code> step in
+<a class="reference internal" href="installing.xml.html#sec-installation"><span class="std std-ref">Installing NixOS</span></a> for more
+information.</p>
+<p>Consider setting up the NixOS bootloader to give you the ability to boot on
+your existing Linux partition. For instance, if you’re using GRUB and your
+existing distribution is running Ubuntu, you may want to add something like
+this to your <code class="docutils literal notranslate"><span class="pre">configuration.nix</span></code>:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-boot-loader-grub-extraentries"><span class="std std-ref">boot.loader.grub.extraEntries</span></a>  = ''
+  menuentry &quot;Ubuntu&quot; {
+    search --set=ubuntu --fs-uuid 3cc3e652-0c1f-4800-8451-033754f68e6e
+    configfile &quot;($ubuntu)/boot/grub/grub.cfg&quot;
+  }
+'';
+</pre>
+<p>(You can find the appropriate UUID for your partition in
+<code class="docutils literal notranslate"><span class="pre">/dev/disk/by-uuid</span></code>)</p>
+</li>
+<li><p class="first">Create the <code class="docutils literal notranslate"><span class="pre">nixbld</span></code> group and user on your original
+distribution:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo groupadd -g 30000 nixbld$ sudo useradd -u 30000 -g nixbld -G nixbld nixbld
+</pre></div>
+</div>
+</li>
+<li><p class="first">Download/build/install NixOS:</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Once you complete this step, you might no longer be able to boot on
+existing systems without the help of a rescue USB drive or similar.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo PATH=&quot;$PATH&quot; NIX_PATH=&quot;$NIX_PATH&quot; \`which nixos-install` --root /mnt
+</pre></div>
+</div>
+<p>Again, please refer to the <code class="docutils literal notranslate"><span class="pre">nixos-install</span></code> step in
+<a class="reference internal" href="installing.xml.html#sec-installation"><span class="std std-ref">Installing NixOS</span></a> for more information.</p>
+<p>That should be it for installation to another partition!</p>
+</li>
+<li><p class="first">Optionally, you may want to clean up your non-NixOS distribution:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo userdel nixbld$ sudo groupdel nixbld
+</pre></div>
+</div>
+<p>If you do not wish to keep the Nix package manager installed either, run
+something like <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">rm</span> <span class="pre">-rv</span> <span class="pre">~/.nix-*</span> <span class="pre">/nix</span></code> and remove the
+line that the Nix installer added to your <code class="docutils literal notranslate"><span class="pre">~/.profile</span></code>.</p>
+</li>
+<li><div class="first admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The following steps are only for installing NixOS in place using
+<code class="docutils literal notranslate"><span class="pre">NIXOS_LUSTRATE</span></code>:</p>
+</div>
+<p>Generate your NixOS configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo \`which nixos-generate-config` --root /
+</pre></div>
+</div>
+<p>Note that this will place the generated configuration files in
+<code class="docutils literal notranslate"><span class="pre">/etc/nixos</span></code>. You’ll probably want to edit the
+configuration files. Refer to the <code class="docutils literal notranslate"><span class="pre">nixos-generate-config</span></code>
+step in <a class="reference internal" href="installing.xml.html#sec-installation"><span class="std std-ref">Installing NixOS</span></a> for more
+information.</p>
+<p>You’ll likely want to set a root password for your first boot using the
+configuration files because you won’t have a chance to enter a password
+until after you reboot. You can initalize the root password to an empty one
+with this line: (and of course don’t forget to set one once you’ve rebooted
+or to lock the account with <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">passwd</span> <span class="pre">-l</span> <span class="pre">root</span></code> if you
+use <code class="docutils literal notranslate"><span class="pre">sudo</span></code>)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>`users.users.root.initialHashedPassword &lt;None&gt;`_  = &quot;&quot;;
+</pre></div>
+</div>
+</li>
+<li><p class="first">Build the NixOS closure and install it in the <code class="docutils literal notranslate"><span class="pre">system</span></code>
+profile:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-env -p /nix/var/nix/profiles/system -f &#39;&lt;nixpkgs/nixos&gt;&#39; -I nixos-config=/etc/nixos/configuration.nix -iA system
+</pre></div>
+</div>
+</li>
+<li><p class="first">Change ownership of the <code class="docutils literal notranslate"><span class="pre">/nix</span></code> tree to root (since your
+Nix install was probably single user):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo chown -R 0.0 /nix
+</pre></div>
+</div>
+</li>
+<li><p class="first">Set up the <code class="docutils literal notranslate"><span class="pre">/etc/NIXOS</span></code> and
+<code class="docutils literal notranslate"><span class="pre">/etc/NIXOS_LUSTRATE</span></code> files:</p>
+<p><code class="docutils literal notranslate"><span class="pre">/etc/NIXOS</span></code> officializes that this is now a NixOS
+partition (the bootup scripts require its presence).</p>
+<p><code class="docutils literal notranslate"><span class="pre">/etc/NIXOS_LUSTRATE</span></code> tells the NixOS bootup scripts to
+move <em>everything</em> that’s in the root partition to
+<code class="docutils literal notranslate"><span class="pre">/old-root</span></code>. This will move your existing distribution out
+of the way in the very early stages of the NixOS bootup. There are
+exceptions (we do need to keep NixOS there after all), so the NixOS
+lustrate process will not touch:</p>
+<ul class="simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">/nix</span></code> directory</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">/boot</span></code> directory</li>
+<li>Any file or directory listed in <code class="docutils literal notranslate"><span class="pre">/etc/NIXOS_LUSTRATE</span></code>
+(one per line)</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Support for <code class="docutils literal notranslate"><span class="pre">NIXOS_LUSTRATE</span></code> was added in NixOS 16.09.
+The act of “lustrating” refers to the wiping of the existing distribution.
+Creating <code class="docutils literal notranslate"><span class="pre">/etc/NIXOS_LUSTRATE</span></code> can also be used on NixOS
+to remove all mutable files from your root partition (anything that’s not
+in <code class="docutils literal notranslate"><span class="pre">/nix</span></code> or <code class="docutils literal notranslate"><span class="pre">/boot</span></code> gets “lustrated” on
+the next boot.</p>
+<p>lustrate /ˈlʌstreɪt/ verb.</p>
+<p class="last">purify by expiatory sacrifice, ceremonial washing, or some other ritual
+action.</p>
+</div>
+<p>Let’s create the files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo touch /etc/NIXOS$ sudo touch /etc/NIXOS_LUSTRATE
+</pre></div>
+</div>
+<p>Let’s also make sure the NixOS configuration files are kept once we reboot
+on NixOS:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ echo etc/nixos | sudo tee -a /etc/NIXOS_LUSTRATE
+</pre></div>
+</div>
+</li>
+<li><p class="first">Finally, move the <code class="docutils literal notranslate"><span class="pre">/boot</span></code> directory of your current
+distribution out of the way (the lustrate process will take care of the
+rest once you reboot, but this one must be moved out now because NixOS
+needs to install its own boot files:</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Once you complete this step, your current distribution will no longer be
+bootable! If you didn’t get all the NixOS configuration right, especially
+those settings pertaining to boot loading and root partition, NixOS may
+not be bootable either. Have a USB rescue device ready in case this
+happens.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo mv -v /boot /boot.bak &amp;&amp;
+sudo /nix/var/nix/profiles/system/bin/switch-to-configuration boot
+</pre></div>
+</div>
+<p>Cross your fingers, reboot, hopefully you should get a NixOS prompt!</p>
+</li>
+<li><p class="first">If for some reason you want to revert to the old distribution, you’ll need
+to boot on a USB rescue disk and do something along these lines:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># mkdir root</span>
+<span class="c1"># mount /dev/sdaX root</span>
+<span class="c1"># mkdir root/nixos-root</span>
+<span class="c1"># mv -v root/* root/nixos-root/</span>
+<span class="c1"># mv -v root/nixos-root/old-root/* root/</span>
+<span class="c1"># mv -v root/boot.bak root/boot  # We had renamed this by hand earlier</span>
+<span class="c1"># umount root</span>
+<span class="c1"># reboot</span>
+</pre></div>
+</div>
+<p>This may work as is or you might also need to reinstall the boot loader</p>
+<p>And of course, if you’re happy with NixOS and no longer need the old
+distribution:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="o">/</span><span class="n">old</span><span class="o">-</span><span class="n">root</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">It’s also worth noting that this whole process can be automated. This is
+especially useful for Cloud VMs, where provider do not provide NixOS. For
+instance,
+<a class="reference external" href="https://github.com/elitak/nixos-infect">nixos-infect</a>
+uses the lustrate process to convert Digital Ocean droplets to NixOS from
+other distributions automatically.</p>
+</li>
+</ol>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="installation.xml.html">Installation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="obtaining.xml.html">Obtaining NixOS</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="installing.xml.html">Installing NixOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changing-config.xml.html">Changing the Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upgrading.xml.html">Upgrading NixOS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="installation.xml.html">Installation</a><ul>
+  <li><a href="installing.xml.html">Installing NixOS</a><ul>
+      <li>Previous: <a href="installing-virtualbox-guest.xml.html" title="previous chapter">Installing in a VirtualBox guest</a></li>
+      <li>Next: <a href="installing-behind-a-proxy.xml.html" title="next chapter">Installing behind a proxy</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/installation/installing-from-other-distro.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

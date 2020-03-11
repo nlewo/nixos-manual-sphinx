@@ -1,0 +1,178 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Installing in a VirtualBox guest &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Installing from another Linux distribution" href="installing-from-other-distro.xml.html" />
+    <link rel="prev" title="Booting from the netboot media (PXE)" href="installing-pxe.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="installing-in-a-virtualbox-guest">
+<span id="sec-instaling-virtualbox-guest"></span><h1>Installing in a VirtualBox guest<a class="headerlink" href="#installing-in-a-virtualbox-guest" title="Permalink to this headline">¶</a></h1>
+<p>Installing NixOS into a VirtualBox guest is convenient for users who want to
+try NixOS without installing it on bare metal. If you want to use a pre-made
+VirtualBox appliance, it is available at
+<a class="reference external" href="https://nixos.org/nixos/download.html">the downloads
+page</a>. If you want to set up a VirtualBox guest manually, follow these
+instructions:</p>
+<ol class="arabic simple">
+<li>Add a New Machine in VirtualBox with OS Type “Linux / Other Linux”</li>
+<li>Base Memory Size: 768 MB or higher.</li>
+<li>New Hard Disk of 8 GB or higher.</li>
+<li>Mount the CD-ROM with the NixOS ISO (by clicking on CD/DVD-ROM)</li>
+<li>Click on Settings / System / Processor and enable PAE/NX</li>
+<li>Click on Settings / System / Acceleration and enable “VT-x/AMD-V”
+acceleration</li>
+<li>Click on Settings / Display / Screen and select VBoxVGA as Graphics Controller</li>
+<li>Save the settings, start the virtual machine, and continue installation
+like normal</li>
+</ol>
+<p>There are a few modifications you should make in configuration.nix. Enable
+booting:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-boot-loader-grub-device"><span class="std std-ref">boot.loader.grub.device</span></a>  = &quot;/dev/sda&quot;;
+</pre>
+<p>Also remove the fsck that runs at startup. It will always fail to run,
+stopping your boot until you press <code class="docutils literal notranslate"><span class="pre">*</span></code>.</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-boot-initrd-checkjournalingfs"><span class="std std-ref">boot.initrd.checkJournalingFS</span></a>  = false;
+</pre>
+<p>Shared folders can be given a name and a path in the host system in the
+VirtualBox settings (Machine / Settings / Shared Folders, then click on the
+“Add” icon). Add the following to the
+<code class="docutils literal notranslate"><span class="pre">/etc/nixos/configuration.nix</span></code> to auto-mount them. If you do
+not add <code class="docutils literal notranslate"><span class="pre">&quot;nofail&quot;</span></code>, the system will no boot properly. The
+same goes for disabling <code class="docutils literal notranslate"><span class="pre">rngd</span></code> which is normally used to get
+randomness but this does not work in virtual machines.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="n">config</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">,</span> <span class="o">...</span><span class="p">}</span> <span class="p">:</span>
+<span class="p">{</span>
+  <span class="n">security</span><span class="o">.</span><span class="n">rngd</span><span class="o">.</span><span class="n">enable</span> <span class="o">=</span> <span class="n">false</span><span class="p">;</span> <span class="o">//</span> <span class="n">otherwise</span> <span class="n">vm</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">boot</span>
+  <span class="o">...</span>
+
+  <span class="n">fileSystems</span><span class="o">.</span><span class="s2">&quot;/virtualboxshare&quot;</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">fsType</span> <span class="o">=</span> <span class="s2">&quot;vboxsf&quot;</span><span class="p">;</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;nameofthesharedfolder&quot;</span><span class="p">;</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;rw&quot;</span> <span class="s2">&quot;nofail&quot;</span> <span class="p">];</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The folder will be available directly under the root directory.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="installation.xml.html">Installation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="obtaining.xml.html">Obtaining NixOS</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="installing.xml.html">Installing NixOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changing-config.xml.html">Changing the Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="upgrading.xml.html">Upgrading NixOS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="installation.xml.html">Installation</a><ul>
+  <li><a href="installing.xml.html">Installing NixOS</a><ul>
+      <li>Previous: <a href="installing-pxe.xml.html" title="previous chapter">Booting from the netboot media (PXE)</a></li>
+      <li>Next: <a href="installing-from-other-distro.xml.html" title="next chapter">Installing from another Linux distribution</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/installation/installing-virtualbox-guest.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

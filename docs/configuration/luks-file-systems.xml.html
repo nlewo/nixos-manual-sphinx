@@ -1,0 +1,194 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>LUKS-Encrypted File Systems &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="X Window System" href="x-windows.xml.html" />
+    <link rel="prev" title="File Systems" href="file-systems.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="luks-encrypted-file-systems">
+<span id="sec-luks-file-systems"></span><h1>LUKS-Encrypted File Systems<a class="headerlink" href="#luks-encrypted-file-systems" title="Permalink to this headline">¶</a></h1>
+<p>NixOS supports file systems that are encrypted using
+<em>LUKS</em> (Linux Unified Key Setup). For example, here is how
+you create an encrypted Ext4 file system on the device
+<code class="file docutils literal notranslate"><span class="pre">/dev/disk/by-uuid/3f6b0024-3a44-4fde-a43a-767b872abe5d</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># cryptsetup luksFormat /dev/disk/by-uuid/3f6b0024-3a44-4fde-a43a-767b872abe5d
+
+WARNING!
+========
+This will overwrite data on /dev/disk/by-uuid/3f6b0024-3a44-4fde-a43a-767b872abe5d irrevocably.
+
+Are you sure? (Type uppercase yes): YES
+Enter LUKS passphrase: \***
+Verify passphrase: \***
+
+# cryptsetup luksOpen /dev/disk/by-uuid/3f6b0024-3a44-4fde-a43a-767b872abe5d crypted
+Enter passphrase for /dev/disk/by-uuid/3f6b0024-3a44-4fde-a43a-767b872abe5d: \***
+
+# mkfs.ext4 /dev/mapper/crypted
+</pre></div>
+</div>
+<p>To ensure that this file system is automatically mounted at boot time as
+<code class="file docutils literal notranslate"><span class="pre">/</span></code>, add the following to
+<code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code>:</p>
+<pre class="literal-block">
+<a class="reference external" href="None">boot.initrd.luks.devices.crypted.device</a>  = &quot;/dev/disk/by-uuid/3f6b0024-3a44-4fde-a43a-767b872abe5d&quot;;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-filesystems"><span class="std std-ref">fileSystems</span></a>.&quot;/&quot;.device = &quot;/dev/mapper/crypted&quot;;
+</pre>
+<p>Should grub be used as bootloader, and <code class="file docutils literal notranslate"><span class="pre">/boot</span></code> is located
+on an encrypted partition, it is necessary to add the following grub option:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-boot-loader-grub-enablecryptodisk"><span class="std std-ref">boot.loader.grub.enableCryptodisk</span></a>  = true;
+</pre>
+</div>
+<div class="section" id="fido2">
+<span id="sec-luks-file-systems-fido2"></span><h1>FIDO2<a class="headerlink" href="#fido2" title="Permalink to this headline">¶</a></h1>
+<p>NixOS also supports unlocking your LUKS-Encrypted file system using a FIDO2 compatible token. In the following example, we will create a new FIDO2 credential
+and add it as a new key to our existing device <code class="file docutils literal notranslate"><span class="pre">/dev/sda2</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># export FIDO2_LABEL=&quot;/dev/sda2 @ $HOSTNAME&quot;</span>
+<span class="c1"># fido2luks credential &quot;$FIDO2_LABEL&quot;</span>
+<span class="n">f1d00200108b9d6e849a8b388da457688e3dd653b4e53770012d8f28e5d3b269865038c346802f36f3da7278b13ad6a3bb6a1452e24ebeeaa24ba40eef559b1b287d2a2f80b7</span>
+
+<span class="c1"># fido2luks -i add-key /dev/sda2 f1d00200108b9d6e849a8b388da457688e3dd653b4e53770012d8f28e5d3b269865038c346802f36f3da7278b13ad6a3bb6a1452e24ebeeaa24ba40eef559b1b287d2a2f80b7</span>
+<span class="n">Password</span><span class="p">:</span>
+<span class="n">Password</span> <span class="p">(</span><span class="n">again</span><span class="p">):</span>
+<span class="n">Old</span> <span class="n">password</span><span class="p">:</span>
+<span class="n">Old</span> <span class="n">password</span> <span class="p">(</span><span class="n">again</span><span class="p">):</span>
+<span class="n">Added</span> <span class="n">to</span> <span class="n">key</span> <span class="n">to</span> <span class="n">device</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sda2</span><span class="p">,</span> <span class="n">slot</span><span class="p">:</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p>To ensure that this file system is decrypted using the FIDO2 compatible key, add the following to <code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>`boot.initrd.luks.fido2Support &lt;None&gt;`_  = true;
+`boot.initrd.luks.devices.&quot;/dev/sda2&quot;.fido2.credential &lt;None&gt;`_  = &quot;f1d00200108b9d6e849a8b388da457688e3dd653b4e53770012d8f28e5d3b269865038c346802f36f3da7278b13ad6a3bb6a1452e24ebeeaa24ba40eef559b1b287d2a2f80b7&quot;;
+</pre></div>
+</div>
+<p>You can also use the FIDO2 passwordless setup, but for security reasons, you might want to enable it only when your device is PIN protected, such as <a class="reference external" href="https://trezor.io/">Trezor</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>`boot.initrd.luks.devices.&quot;/dev/sda2&quot;.fido2.passwordLess &lt;None&gt;`_  = true;
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="configuration.xml.html">Configuration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config-syntax.xml.html">Configuration Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="package-mgmt.xml.html">Package Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-mgmt.xml.html">User Management</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="file-systems.xml.html">File Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="x-windows.xml.html">X Window System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xfce.xml.html">Xfce Desktop Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="networking.xml.html">Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linux-kernel.xml.html">Linux Kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix.xml.html">Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profiles.xml.html">Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kubernetes.xml.html">Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="configuration.xml.html">Configuration</a><ul>
+  <li><a href="file-systems.xml.html">File Systems</a><ul>
+      <li>Previous: <a href="file-systems.xml.html" title="previous chapter">File Systems</a></li>
+      <li>Next: <a href="x-windows.xml.html" title="next chapter">X Window System</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/configuration/luks-file-systems.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

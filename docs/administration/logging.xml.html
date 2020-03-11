@@ -1,0 +1,163 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Logging &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cleaning the Nix Store" href="cleaning-store.xml.html" />
+    <link rel="prev" title="Control Groups" href="control-groups.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="logging">
+<span id="sec-logging"></span><h1>Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h1>
+<p>System-wide logging is provided by systemd’s <em>journal</em>,
+which subsumes traditional logging daemons such as syslogd and klogd. Log
+entries are kept in binary files in <code class="file docutils literal notranslate"><span class="pre">/var/log/journal/</span></code>.
+The command <code class="docutils literal notranslate"><span class="pre">journalctl</span></code> allows you to see the contents of
+the journal. For example,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ journalctl -b
+</pre></div>
+</div>
+<p>shows all journal entries since the last reboot. (The output of
+<strong class="command">journalctl</strong> is piped into <strong class="command">less</strong> by
+default.) You can use various options and match operators to restrict output
+to messages of interest. For instance, to get all messages from PostgreSQL:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ journalctl -u postgresql.service
+-- Logs begin at Mon, 2013-01-07 13:28:01 CET, end at Tue, 2013-01-08 01:09:57 CET. --
+...
+Jan 07 15:44:14 hagbard postgres[2681]: \[2-1] LOG:  database system is shut down
+-- Reboot --
+Jan 07 15:45:10 hagbard postgres[2532]: \[1-1] LOG:  database system was shut down at 2013-01-07 15:44:14 CET
+Jan 07 15:45:13 hagbard postgres[2500]: \[1-1] LOG:  database system is ready to accept connections
+</pre></div>
+</div>
+<p>Or to get all messages since the last reboot that have at least a
+“critical” severity level:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ journalctl -b -p crit
+Dec 17 21:08:06 mandark sudo[3673]: pam_unix(sudo:auth): auth could not identify password for \[alice]
+Dec 29 01:30:22 mandark kernel[6131]: \[1053513.909444] CPU6: Core temperature above threshold, cpu clock throttled (total events = 1)
+</pre></div>
+</div>
+<p>The system journal is readable by root and by users in the
+<code class="docutils literal notranslate"><span class="pre">wheel</span></code> and <code class="docutils literal notranslate"><span class="pre">systemd-journal</span></code> groups. All
+users have a private journal that can be read using
+<strong class="command">journalctl</strong>.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="running.xml.html">Administration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="service-mgmt.xml.html">Service Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rebooting.xml.html">Rebooting and Shutting Down</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-sessions.xml.html">User Sessions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-groups.xml.html">Control Groups</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cleaning-store.xml.html">Cleaning the Nix Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="containers.xml.html">Container Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.xml.html">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="running.xml.html">Administration</a><ul>
+      <li>Previous: <a href="control-groups.xml.html" title="previous chapter">Control Groups</a></li>
+      <li>Next: <a href="cleaning-store.xml.html" title="next chapter">Cleaning the Nix Store</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/administration/logging.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

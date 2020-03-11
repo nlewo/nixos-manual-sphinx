@@ -1,0 +1,541 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Release 18.09 (“Jellyfish”, 2018/10/05) &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="release-18-09-jellyfish-2018-10-05">
+<span id="sec-release-18-09"></span><h1>Release 18.09 (“Jellyfish”, 2018/10/05)<a class="headerlink" href="#release-18-09-jellyfish-2018-10-05" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="highlights">
+<span id="sec-release-18-09-highlights"></span><h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<p>In addition to numerous new and upgraded packages, this release has the
+following notable updates:</p>
+<ul class="simple">
+<li>End of support is planned for end of April 2019, handing over to 19.03.</li>
+<li>Platform support: x86_64-linux and x86_64-darwin as always. Support for
+aarch64-linux is as with the previous releases, not equivalent to the
+x86-64-linux release, but with efforts to reach parity.</li>
+<li>Nix has been updated to 2.1; see its
+<a class="reference external" href="https://nixos.org/nix/manual/#ssec-relnotes-2.1">release
+notes</a>.</li>
+<li>Core versions: linux: 4.14 LTS (unchanged), glibc: 2.26 → 2.27, gcc: 7
+(unchanged), systemd: 237 → 239.</li>
+<li>Desktop version changes: gnome: 3.26 → 3.28, (KDE) plasma-desktop: 5.12
+→ 5.13.</li>
+</ul>
+<p>Notable changes and additions for 18.09 include:</p>
+<ul>
+<li><p class="first">Support for wrapping binaries using <code class="docutils literal notranslate"><span class="pre">firejail</span></code> has been
+added through <code class="docutils literal notranslate"><span class="pre">programs.firejail.wrappedBinaries</span></code>.</p>
+<p>For example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">programs</span><span class="o">.</span><span class="n">firejail</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">enable</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+  <span class="n">wrappedBinaries</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">firefox</span> <span class="o">=</span> <span class="s2">&quot;${lib.getBin pkgs.firefox}/bin/firefox&quot;</span><span class="p">;</span>
+    <span class="n">mpv</span> <span class="o">=</span> <span class="s2">&quot;${lib.getBin pkgs.mpv}/bin/mpv&quot;</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>This will place <code class="docutils literal notranslate"><span class="pre">firefox</span></code> and <code class="docutils literal notranslate"><span class="pre">mpv</span></code>
+binaries in the global path wrapped by firejail.</p>
+</li>
+<li><p class="first">User channels are now in the default <code class="docutils literal notranslate"><span class="pre">NIX_PATH</span></code>, allowing
+users to use their personal <strong class="command">nix-channel</strong> defined
+channels in <strong class="command">nix-build</strong> and <strong class="command">nix-shell</strong>
+commands, as well as in imports like import
+&lt;mychannel&gt;.</p>
+<p>For example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgsunstable
+$ nix-channel --update
+$ nix-build &#39;&lt;nixpkgsunstable&gt;&#39; -A gitFull
+$ nix run -f &#39;&lt;nixpkgsunstable&gt;&#39; gitFull
+$ nix-instantiate -E &#39;(import &lt;nixpkgsunstable&gt; {}).gitFull&#39;
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="new-services">
+<span id="sec-release-18-09-new-services"></span><h1>New Services<a class="headerlink" href="#new-services" title="Permalink to this headline">¶</a></h1>
+<p>A curated selection of new services that were added since the last release:</p>
+<ul>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">services.cassandra</span></code> module has been reworked and was
+rewritten from scratch. The service has succeeding tests for the versions
+2.1, 2.2, 3.0 and 3.11 of
+<a class="reference external" href="https://cassandra.apache.org/">Apache
+Cassandra</a>.</p>
+</li>
+<li><p class="first">There is a new <code class="docutils literal notranslate"><span class="pre">services.foundationdb</span></code> module for
+deploying
+<a class="reference external" href="https://www.foundationdb.org">FoundationDB</a>
+clusters.</p>
+</li>
+<li><p class="first">When enabled the <code class="docutils literal notranslate"><span class="pre">iproute2</span></code> will copy the files expected
+by ip route (e.g., <code class="file docutils literal notranslate"><span class="pre">rt_tables</span></code>) in
+<code class="file docutils literal notranslate"><span class="pre">/etc/iproute2</span></code>. This allows to write aliases for
+routing tables for instance.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">services.strongswan-swanctl</span></code> is a modern replacement for
+<code class="docutils literal notranslate"><span class="pre">services.strongswan</span></code>. You can use either one of them to
+setup IPsec VPNs but not both at the same time.</p>
+<p><code class="docutils literal notranslate"><span class="pre">services.strongswan-swanctl</span></code> uses the
+<a class="reference external" href="https://wiki.strongswan.org/projects/strongswan/wiki/swanctl">swanctl</a>
+command which uses the modern
+<a class="reference external" href="https://github.com/strongswan/strongswan/blob/master/src/libcharon/plugins/vici/README.md">vici</a>
+<em>Versatile IKE Configuration Interface</em>. The deprecated
+<code class="docutils literal notranslate"><span class="pre">ipsec</span></code> command used in
+<code class="docutils literal notranslate"><span class="pre">services.strongswan</span></code> is using the legacy
+<a class="reference external" href="https://github.com/strongswan/strongswan/blob/master/README_LEGACY.md">stroke
+configuration interface</a>.</p>
+</li>
+<li><p class="first">The new <code class="docutils literal notranslate"><span class="pre">services.elasticsearch-curator</span></code> service
+periodically curates or manages, your Elasticsearch indices and snapshots.</p>
+</li>
+</ul>
+<p>Every new services:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">./config/xdg/autostart.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./config/xdg/icons.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./config/xdg/menus.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./config/xdg/mime.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./hardware/brightnessctl.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./hardware/onlykey.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./hardware/video/uvcvideo/default.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./misc/documentation.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./programs/firejail.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./programs/iftop.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./programs/sedutil.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./programs/singularity.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./programs/xss-lock.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./programs/zsh/zsh-autosuggestions.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/admin/oxidized.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/backup/duplicati.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/backup/restic.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/backup/restic-rest-server.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/cluster/hadoop/default.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/databases/aerospike.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/databases/monetdb.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/desktops/bamf.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/desktops/flatpak.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/desktops/zeitgeist.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/development/bloop.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/development/jupyter/default.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/hardware/lcd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/hardware/undervolt.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/misc/clipmenu.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/misc/gitweb.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/misc/serviio.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/misc/safeeyes.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/misc/sysprof.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/misc/weechat.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/monitoring/datadog-agent.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/monitoring/incron.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/dnsdist.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/freeradius.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/hans.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/morty.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/ndppd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/ocserv.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/owamp.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/quagga.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/shadowsocks.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/stubby.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/networking/zeronet.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/security/certmgr.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/security/cfssl.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/security/oauth2_proxy_nginx.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/web-apps/virtlyst.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/web-apps/youtrack.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/web-servers/hitch/default.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/web-servers/hydron.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/web-servers/meguca.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./services/web-servers/nginx/gitweb.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./virtualisation/kvmgt.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">./virtualisation/qemu-guest-agent.nix</span></code></li>
+</ul>
+</div>
+<div class="section" id="backward-incompatibilities">
+<span id="sec-release-18-09-incompatibilities"></span><h1>Backward Incompatibilities<a class="headerlink" href="#backward-incompatibilities" title="Permalink to this headline">¶</a></h1>
+<p>When upgrading from a previous release, please be aware of the following
+incompatible changes:</p>
+<ul>
+<li><p class="first">Some licenses that were incorrectly not marked as unfree now are. This is
+the case for:</p>
+<ul class="simple">
+<li>cc-by-nc-sa-20: Creative Commons Attribution Non Commercial Share Alike
+2.0</li>
+<li>cc-by-nc-sa-25: Creative Commons Attribution Non Commercial Share Alike
+2.5</li>
+<li>cc-by-nc-sa-30: Creative Commons Attribution Non Commercial Share Alike
+3.0</li>
+<li>cc-by-nc-sa-40: Creative Commons Attribution Non Commercial Share Alike
+4.0</li>
+<li>cc-by-nd-30: Creative Commons Attribution-No Derivative Works v3.00</li>
+<li>msrla: Microsoft Research License Agreement</li>
+</ul>
+</li>
+<li><p class="first">The deprecated <code class="docutils literal notranslate"><span class="pre">services.cassandra</span></code> module has seen a
+complete rewrite. (See above.)</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">lib.strict</span></code> is removed. Use
+<code class="docutils literal notranslate"><span class="pre">builtins.seq</span></code> instead.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">clementine</span></code> package points now to the free
+derivation. <code class="docutils literal notranslate"><span class="pre">clementineFree</span></code> is removed now and
+<code class="docutils literal notranslate"><span class="pre">clementineUnfree</span></code> points to the package which is bundled
+with the unfree <code class="docutils literal notranslate"><span class="pre">libspotify</span></code> package.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">netcat</span></code> package is now taken directly from OpenBSD’s
+<code class="docutils literal notranslate"><span class="pre">libressl</span></code>, instead of relying on Debian’s fork. The new
+version should be very close to the old version, but there are some minor
+differences. Importantly, flags like -b, -q, -C, and -Z are no longer
+accepted by the nc command.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">services.docker-registry.extraConfig</span></code> object doesn’t
+contain environment variables anymore. Instead it needs to provide an
+object structure that can be mapped onto the YAML configuration defined in
+<cite>the
+``docker/distribution`</cite> docs &lt;<a class="reference external" href="https://github.com/docker/distribution/blob/v2.6.2/docs/configuration.md">https://github.com/docker/distribution/blob/v2.6.2/docs/configuration.md</a>&gt;`_.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">gnucash</span></code> has changed from version 2.4 to 3.x. If you’ve
+been using <code class="docutils literal notranslate"><span class="pre">gnucash</span></code> (version 2.4) instead of
+<code class="docutils literal notranslate"><span class="pre">gnucash26</span></code> (version 2.6) you must open your Gnucash data
+file(s) with <code class="docutils literal notranslate"><span class="pre">gnucash26</span></code> and then save them to upgrade
+the file format. Then you may use your data file(s) with Gnucash 3.x. See
+the upgrade
+<a class="reference external" href="https://wiki.gnucash.org/wiki/FAQ#Using_Different_Versions.2C_Up_And_Downgrade">documentation</a>.
+Gnucash 2.4 is still available under the attribute
+<code class="docutils literal notranslate"><span class="pre">gnucash24</span></code>.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">services.munge</span></code> now runs as user (and group)
+<code class="docutils literal notranslate"><span class="pre">munge</span></code> instead of root. Make sure the key file is
+accessible to the daemon.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">dockerTools.buildImage</span></code> now uses <code class="docutils literal notranslate"><span class="pre">null</span></code>
+as default value for <code class="docutils literal notranslate"><span class="pre">tag</span></code>, which indicates that the nix
+output hash will be used as tag.</p>
+</li>
+<li><p class="first">The ELK stack: <code class="docutils literal notranslate"><span class="pre">elasticsearch</span></code>,
+<code class="docutils literal notranslate"><span class="pre">logstash</span></code> and <code class="docutils literal notranslate"><span class="pre">kibana</span></code> has been
+upgraded from 2.* to 6.3.*. The 2.* versions have been
+<a class="reference external" href="https://www.elastic.co/support/eol">unsupported since
+last year</a> so they have been removed. You can still use the 5.*
+versions under the names <code class="docutils literal notranslate"><span class="pre">elasticsearch5</span></code>,
+<code class="docutils literal notranslate"><span class="pre">logstash5</span></code> and <code class="docutils literal notranslate"><span class="pre">kibana5</span></code>.</p>
+<p>The elastic beats: <code class="docutils literal notranslate"><span class="pre">filebeat</span></code>,
+<code class="docutils literal notranslate"><span class="pre">heartbeat</span></code>, <code class="docutils literal notranslate"><span class="pre">metricbeat</span></code> and
+<code class="docutils literal notranslate"><span class="pre">packetbeat</span></code> have had the same treatment: they now target
+6.3.* as well. The 5.* versions are available under the names:
+<code class="docutils literal notranslate"><span class="pre">filebeat5</span></code>, <code class="docutils literal notranslate"><span class="pre">heartbeat5</span></code>,
+<code class="docutils literal notranslate"><span class="pre">metricbeat5</span></code> and <code class="docutils literal notranslate"><span class="pre">packetbeat5</span></code></p>
+<p>The ELK-6.3 stack now comes with
+<a class="reference external" href="https://www.elastic.co/products/x-pack/open">X-Pack by
+default</a>. Since X-Pack is licensed under the
+<a class="reference external" href="https://github.com/elastic/elasticsearch/blob/master/licenses/ELASTIC-LICENSE.txt">Elastic
+License</a> the ELK packages now have an unfree license. To use them
+you need to specify <code class="docutils literal notranslate"><span class="pre">allowUnfree</span> <span class="pre">=</span> <span class="pre">true;</span></code> in your nixpkgs
+configuration.</p>
+<p>Fortunately there is also a free variant of the ELK stack without X-Pack.
+The packages are available under the names:
+<code class="docutils literal notranslate"><span class="pre">elasticsearch-oss</span></code>, <code class="docutils literal notranslate"><span class="pre">logstash-oss</span></code> and
+<code class="docutils literal notranslate"><span class="pre">kibana-oss</span></code>.</p>
+</li>
+<li><p class="first">Options
+<code class="docutils literal notranslate"><span class="pre">boot.initrd.luks.devices.*name*.yubikey.ramfsMountPoint</span></code>
+<code class="docutils literal notranslate"><span class="pre">boot.initrd.luks.devices.*name*.yubikey.storage.mountPoint</span></code>
+were removed. <code class="docutils literal notranslate"><span class="pre">luksroot.nix</span></code> module never supported more
+than one YubiKey at a time anyway, hence those options never had any
+effect. You should be able to remove them from your config without any
+issues.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">stdenv.system</span></code> and <code class="docutils literal notranslate"><span class="pre">system</span></code> in nixpkgs
+now refer to the host platform instead of the build platform. For native
+builds this is not change, let alone a breaking one. For cross builds, it
+is a breaking change, and <code class="docutils literal notranslate"><span class="pre">stdenv.buildPlatform.system</span></code>
+can be used instead for the old behavior. They should be using that
+anyways for clarity.</p>
+</li>
+<li><p class="first">Groups <code class="docutils literal notranslate"><span class="pre">kvm</span></code> and <code class="docutils literal notranslate"><span class="pre">render</span></code> are introduced
+now, as systemd requires them.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="other-notable-changes">
+<span id="sec-release-18-09-notable-changes"></span><h1>Other Notable Changes<a class="headerlink" href="#other-notable-changes" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">dockerTools.pullImage</span></code> relies on image digest instead of
+image tag to download the image. The <code class="docutils literal notranslate"><span class="pre">sha256</span></code> of a pulled
+image has to be updated.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">lib.attrNamesToStr</span></code> has been deprecated. Use more
+specific concatenation (<code class="docutils literal notranslate"><span class="pre">lib.concat(Map)StringsSep</span></code>)
+instead.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">lib.addErrorContextToAttrs</span></code> has been deprecated. Use
+<code class="docutils literal notranslate"><span class="pre">builtins.addErrorContext</span></code> directly.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">lib.showVal</span></code> has been deprecated. Use
+<code class="docutils literal notranslate"><span class="pre">lib.traceSeqN</span></code> instead.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">lib.traceXMLVal</span></code> has been deprecated. Use
+<code class="docutils literal notranslate"><span class="pre">lib.traceValFn</span> <span class="pre">builtins.toXml</span></code> instead.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">lib.traceXMLValMarked</span></code> has been deprecated. Use
+<code class="docutils literal notranslate"><span class="pre">lib.traceValFn</span> <span class="pre">(x:</span> <span class="pre">str</span> <span class="pre">+</span> <span class="pre">builtins.toXML</span> <span class="pre">x)</span></code> instead.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">pkgs</span></code> argument to NixOS modules can now be set
+directly using <code class="docutils literal notranslate"><span class="pre">nixpkgs.pkgs</span></code>. Previously, only the
+<code class="docutils literal notranslate"><span class="pre">system</span></code>, <code class="docutils literal notranslate"><span class="pre">config</span></code> and
+<code class="docutils literal notranslate"><span class="pre">overlays</span></code> arguments could be used to influence
+<code class="docutils literal notranslate"><span class="pre">pkgs</span></code>.</p>
+</li>
+<li><p class="first">A NixOS system can now be constructed more easily based on a preexisting
+invocation of Nixpkgs. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inherit</span> <span class="p">(</span><span class="n">pkgs</span><span class="o">.</span><span class="n">nixos</span> <span class="p">{</span>
+  <span class="n">boot</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">grub</span><span class="o">.</span><span class="n">enable</span> <span class="o">=</span> <span class="n">false</span><span class="p">;</span>
+  <span class="n">fileSystems</span><span class="o">.</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;/dev/xvda1&quot;</span><span class="p">;</span>
+<span class="p">})</span> <span class="n">toplevel</span> <span class="n">kernel</span> <span class="n">initialRamdisk</span> <span class="n">manual</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This benefits evaluation performance, lets you write Nixpkgs packages that
+depend on NixOS images and is consistent with a deployment architecture
+that would be centered around Nixpkgs overlays.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">lib.traceValIfNot</span></code> has been deprecated. Use
+<code class="docutils literal notranslate"><span class="pre">if/then/else</span></code> and <code class="docutils literal notranslate"><span class="pre">lib.traceValSeq</span></code>
+instead.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">lib.traceCallXml</span></code> has been deprecated. Please complain
+if you use the function regularly.</p>
+</li>
+<li><p class="first">The attribute <code class="docutils literal notranslate"><span class="pre">lib.nixpkgsVersion</span></code> has been deprecated in
+favor of <code class="docutils literal notranslate"><span class="pre">lib.version</span></code>. Please refer to the discussion in
+<a class="reference external" href="https://github.com/NixOS/nixpkgs/pull/39416#discussion_r183845745">NixOS/nixpkgs#39416</a>
+for further reference.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">lib.recursiveUpdateUntil</span></code> was not acting according to
+its specification. It has been fixed to act according to the docstring,
+and a test has been added.</p>
+</li>
+<li><p class="first">The module for has two new options now:</p>
+<blockquote>
+<div><p>Puts the generated Diffie-Hellman parameters into the Nix store instead
+of managing them in a stateful manner in
+<code class="file docutils literal notranslate"><span class="pre">/var/lib/dhparams</span></code>.</p>
+</div></blockquote>
+<blockquote>
+<div><p>The default bit size to use for the generated Diffie-Hellman
+parameters.</p>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The path to the actual generated parameter files should now be queried
+using
+<code class="docutils literal notranslate"><span class="pre">config.security.dhparams.params.*name*.path</span></code>
+because it might be either in the Nix store or in a directory configured
+by .</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Module implementers should not set a specific bit size in order to let
+users configure it by themselves if they want to have a different bit
+size than the default (2048).</p>
+<p>An example usage of this would be:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span>{ config, ... }:
+
+{
+  security.dhparams.params.myservice = {};
+  environment.etc.&quot;myservice.conf&quot;.text = &#39;&#39;
+    dhparams = ${config.security.dhparams.params.myservice.path}
+  &#39;&#39;;
+}
+</pre></div>
+</div>
+</div>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">networking.networkmanager.useDnsmasq</span></code> has been
+deprecated. Use <code class="docutils literal notranslate"><span class="pre">networking.networkmanager.dns</span></code> instead.</p>
+</li>
+<li><p class="first">The Kubernetes package has been bumped to major version 1.11. Please
+consult the
+<a class="reference external" href="https://github.com/kubernetes/kubernetes/blob/release-1.11/CHANGELOG-1.11.md">release
+notes</a> for details on new features and api changes.</p>
+</li>
+<li><p class="first">The option
+<code class="docutils literal notranslate"><span class="pre">services.kubernetes.apiserver.admissionControl</span></code> was
+renamed to
+<code class="docutils literal notranslate"><span class="pre">services.kubernetes.apiserver.enableAdmissionPlugins</span></code>.</p>
+</li>
+<li><p class="first">Recommended way to access the Kubernetes Dashboard is via HTTPS (TLS)
+Therefore; public service port for the dashboard has changed to 443
+(container port 8443) and scheme to https.</p>
+</li>
+<li><p class="first">The option <code class="docutils literal notranslate"><span class="pre">services.kubernetes.apiserver.address</span></code> was
+renamed to <code class="docutils literal notranslate"><span class="pre">services.kubernetes.apiserver.bindAddress</span></code>.
+Note that the default value has changed from 127.0.0.1 to 0.0.0.0.</p>
+</li>
+<li><p class="first">The option <code class="docutils literal notranslate"><span class="pre">services.kubernetes.apiserver.publicAddress</span></code>
+was not used and thus has been removed.</p>
+</li>
+<li><p class="first">The option
+<code class="docutils literal notranslate"><span class="pre">services.kubernetes.addons.dashboard.enableRBAC</span></code> was
+renamed to
+<code class="docutils literal notranslate"><span class="pre">services.kubernetes.addons.dashboard.rbac.enable</span></code>.</p>
+</li>
+<li><p class="first">The Kubernetes Dashboard now has only minimal RBAC permissions by default.
+If dashboard cluster-admin rights are desired, set
+<code class="docutils literal notranslate"><span class="pre">services.kubernetes.addons.dashboard.rbac.clusterAdmin</span></code>
+to true. On existing clusters, in order for the revocation of privileges
+to take effect, the current ClusterRoleBinding for kubernetes-dashboard
+must be manually removed: <code class="docutils literal notranslate"><span class="pre">kubectl</span> <span class="pre">delete</span> <span class="pre">clusterrolebinding</span>
+<span class="pre">kubernetes-dashboard</span></code></p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">programs.screen</span></code> module provides allows to configure
+<code class="docutils literal notranslate"><span class="pre">/etc/screenrc</span></code>, however the module behaved fairly
+counterintuitive as the config exists, but the package wasn’t available.
+Since 18.09 <code class="docutils literal notranslate"><span class="pre">pkgs.screen</span></code> will be added to
+<code class="docutils literal notranslate"><span class="pre">environment.systemPackages</span></code>.</p>
+</li>
+<li><p class="first">The module now uses WPA2 by
+default.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">s6Dns</span></code>, <code class="docutils literal notranslate"><span class="pre">s6Networking</span></code>,
+<code class="docutils literal notranslate"><span class="pre">s6LinuxUtils</span></code> and <code class="docutils literal notranslate"><span class="pre">s6PortableUtils</span></code>
+renamed to <code class="docutils literal notranslate"><span class="pre">s6-dns</span></code>, <code class="docutils literal notranslate"><span class="pre">s6-networking</span></code>,
+<code class="docutils literal notranslate"><span class="pre">s6-linux-utils</span></code> and <code class="docutils literal notranslate"><span class="pre">s6-portable-utils</span></code>
+respectively.</p>
+</li>
+<li><p class="first">The module option is now defaulted to
+<code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</li>
+<li><p class="first">The config activation script of <code class="docutils literal notranslate"><span class="pre">nixos-rebuild</span></code> now
+<a class="reference external" href="https://www.freedesktop.org/software/systemd/man/systemctl.html#Manager%20Lifecycle%20Commands">reloads</a>
+all user units for each authenticated user.</p>
+</li>
+<li><p class="first">The default display manager is now LightDM. To use SLiM set
+<code class="docutils literal notranslate"><span class="pre">services.xserver.displayManager.slim.enable</span></code> to
+<code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
+</li>
+<li><p class="first">NixOS option descriptions are now automatically broken up into individual
+paragraphs if the text contains two consecutive newlines, so it’s no
+longer necessary to use &lt;/para&gt;&lt;para&gt; to start a
+new paragraph.</p>
+</li>
+<li><p class="first">Top-level <code class="docutils literal notranslate"><span class="pre">buildPlatform</span></code>,
+<code class="docutils literal notranslate"><span class="pre">hostPlatform</span></code>, and <code class="docutils literal notranslate"><span class="pre">targetPlatform</span></code> in
+Nixpkgs are deprecated. Please use their equivalents in
+<code class="docutils literal notranslate"><span class="pre">stdenv</span></code> instead:
+<code class="docutils literal notranslate"><span class="pre">stdenv.buildPlatform</span></code>,
+<code class="docutils literal notranslate"><span class="pre">stdenv.hostPlatform</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">stdenv.targetPlatform</span></code>.</p>
+</li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/release-notes/rl-1809.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

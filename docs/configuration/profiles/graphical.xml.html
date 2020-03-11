@@ -1,0 +1,143 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Graphical &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Hardened" href="hardened.xml.html" />
+    <link rel="prev" title="Docker Container" href="docker-container.xml.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="graphical">
+<span id="sec-profile-graphical"></span><h1>Graphical<a class="headerlink" href="#graphical" title="Permalink to this headline">¶</a></h1>
+<p>Defines a NixOS configuration with the Plasma 5 desktop. It’s used by the
+graphical installation CD.</p>
+<p>It sets <a class="reference internal" href="../../generated/options-db.xml.html#opt-services-xserver-enable"><span class="std std-ref">services.xserver.enable</span></a>,
+<a class="reference internal" href="../../generated/options-db.xml.html#opt-services-xserver-displaymanager-sddm-enable"><span class="std std-ref">services.xserver.displayManager.sddm.enable</span></a>,
+<a class="reference internal" href="../../generated/options-db.xml.html#opt-services-xserver-desktopmanager-plasma5-enable"><span class="std std-ref">services.xserver.desktopManager.plasma5.enable</span></a>, and
+<a class="reference internal" href="../../generated/options-db.xml.html#opt-services-xserver-libinput-enable"><span class="std std-ref">services.xserver.libinput.enable</span></a> to true. It also
+includes glxinfo and firefox in the system packages list.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../configuration.xml.html">Configuration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../config-syntax.xml.html">Configuration Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../package-mgmt.xml.html">Package Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user-mgmt.xml.html">User Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../file-systems.xml.html">File Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../x-windows.xml.html">X Window System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../xfce.xml.html">Xfce Desktop Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../networking.xml.html">Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../linux-kernel.xml.html">Linux Kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../matrix.xml.html">Matrix</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../profiles.xml.html">Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../kubernetes.xml.html">Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../configuration.xml.html">Configuration</a><ul>
+  <li><a href="../profiles.xml.html">Profiles</a><ul>
+      <li>Previous: <a href="docker-container.xml.html" title="previous chapter">Docker Container</a></li>
+      <li>Next: <a href="hardened.xml.html" title="next chapter">Hardened</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/configuration/profiles/graphical.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

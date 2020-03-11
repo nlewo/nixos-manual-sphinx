@@ -1,0 +1,588 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Options Types &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Option Definitions" href="option-def.xml.html" />
+    <link rel="prev" title="Option Declarations" href="option-declarations.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="options-types">
+<span id="sec-option-types"></span><h1>Options Types<a class="headerlink" href="#options-types" title="Permalink to this headline">¶</a></h1>
+<p>Option types are a way to put constraints on the values a module option can
+take. Types are also responsible of how values are merged in case of multiple
+value definitions.</p>
+</div>
+<div class="section" id="basic-types">
+<span id="sec-option-types-basic"></span><h1>Basic Types<a class="headerlink" href="#basic-types" title="Permalink to this headline">¶</a></h1>
+<p>Basic types are the simplest available types in the module system. Basic
+types include multiple string types that mainly differ in how definition
+merging is handled.</p>
+<p><code class="docutils literal notranslate"><span class="pre">types.attrs</span></code></p>
+<blockquote>
+<div>A free-form attribute set.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.bool</span></code></p>
+<blockquote>
+<div>A boolean, its values can be <code class="docutils literal notranslate"><span class="pre">true</span></code> or
+<code class="docutils literal notranslate"><span class="pre">false</span></code>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.path</span></code></p>
+<blockquote>
+<div>A filesystem path, defined as anything that when coerced to a string
+starts with a slash. Even if derivations can be considered as path, the
+more specific <code class="docutils literal notranslate"><span class="pre">types.package</span></code> should be preferred.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.package</span></code></p>
+<blockquote>
+<div>A derivation or a store path.</div></blockquote>
+<p>Integer-related types:</p>
+<p><code class="docutils literal notranslate"><span class="pre">types.int</span></code></p>
+<blockquote>
+<div>A signed integer.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.ints.{s8,</span> <span class="pre">s16,</span> <span class="pre">s32}</span></code></p>
+<blockquote>
+<div>Signed integers with a fixed length (8, 16 or 32 bits). They go from
+−2<sup>n</sup>/2 to 2<sup>n</sup>/2−1 respectively (e.g. <code class="docutils literal notranslate"><span class="pre">−128</span></code> to
+<code class="docutils literal notranslate"><span class="pre">127</span></code> for 8 bits).</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.ints.unsigned</span></code></p>
+<blockquote>
+<div>An unsigned integer (that is &gt;= 0).</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.ints.{u8,</span> <span class="pre">u16,</span> <span class="pre">u32}</span></code></p>
+<blockquote>
+<div>Unsigned integers with a fixed length (8, 16 or 32 bits). They go from
+0 to
+2<sup>n`−1 respectively (e.g. ``0`</sup> to
+<code class="docutils literal notranslate"><span class="pre">255</span></code> for 8 bits).</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.ints.positive</span></code></p>
+<blockquote>
+<div>A positive integer (that is &gt; 0).</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.port</span></code></p>
+<blockquote>
+<div>A port number. This type is an alias to
+<code class="docutils literal notranslate"><span class="pre">`types.ints.u16</span></code> &lt;None&gt;`_.</div></blockquote>
+<p>String-related types:</p>
+<p><code class="docutils literal notranslate"><span class="pre">types.str</span></code></p>
+<blockquote>
+<div>A string. Multiple definitions cannot be merged.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.lines</span></code></p>
+<blockquote>
+<div>A string. Multiple definitions are concatenated with a new line
+<code class="docutils literal notranslate"><span class="pre">&quot;\\n&quot;</span></code>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.commas</span></code></p>
+<blockquote>
+<div>A string. Multiple definitions are concatenated with a comma
+<code class="docutils literal notranslate"><span class="pre">&quot;,&quot;</span></code>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.envVar</span></code></p>
+<blockquote>
+<div>A string. Multiple definitions are concatenated with a collon
+<code class="docutils literal notranslate"><span class="pre">&quot;:&quot;</span></code>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.strMatching</span></code></p>
+<blockquote>
+<div>A string matching a specific regular expression. Multiple definitions
+cannot be merged. The regular expression is processed using
+<code class="docutils literal notranslate"><span class="pre">builtins.match</span></code>.</div></blockquote>
+</div>
+<div class="section" id="value-types">
+<span id="sec-option-types-value"></span><h1>Value Types<a class="headerlink" href="#value-types" title="Permalink to this headline">¶</a></h1>
+<p>Value types are types that take a value parameter.</p>
+<p><code class="docutils literal notranslate"><span class="pre">types.enum</span></code> <em>l</em></p>
+<blockquote>
+<div>One element of the list <em>l</em>, e.g.
+<code class="docutils literal notranslate"><span class="pre">types.enum</span> <span class="pre">[</span> <span class="pre">&quot;left&quot;</span> <span class="pre">&quot;right&quot;</span> <span class="pre">]</span></code>. Multiple definitions
+cannot be merged.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.separatedString</span></code> <em>sep</em></p>
+<blockquote>
+<div>A string with a custom separator <em>sep</em>, e.g.
+<code class="docutils literal notranslate"><span class="pre">types.separatedString</span> <span class="pre">&quot;\|&quot;</span></code>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.ints.between</span></code> <em>lowest</em> <em>highest</em></p>
+<blockquote>
+<div>An integer between <em>lowest</em> and
+<em>highest</em> (both inclusive). Useful for creating
+types like <code class="docutils literal notranslate"><span class="pre">types.port</span></code>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.submodule</span></code> <em>o</em></p>
+<blockquote>
+<div>A set of sub options <em>o</em>.
+<em>o</em> can be an attribute set, a function
+returning an attribute set, or a path to a file containing such a value. Submodules are used in
+composed types to create modular options. This is equivalent to
+<code class="docutils literal notranslate"><span class="pre">types.submoduleWith</span> <span class="pre">{</span> <span class="pre">modules</span> <span class="pre">=</span> <span class="pre">toList</span> <span class="pre">o;</span> <span class="pre">shorthandOnlyDefinesConfig</span> <span class="pre">=</span> <span class="pre">true;</span> <span class="pre">}</span></code>.
+Submodules are detailed in
+<a class="reference internal" href="#section-option-types-submodule"><span class="std std-ref">Submodule</span></a>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.submoduleWith</span></code> {
+<em>modules</em>,
+<em>specialArgs</em> ? {},
+<em>shorthandOnlyDefinesConfig</em> ? false }</p>
+<blockquote>
+<div><p>Like <code class="docutils literal notranslate"><span class="pre">types.submodule</span></code>, but more flexible and with better defaults.
+It has parameters</p>
+<ul>
+<li><p class="first"><em>modules</em>
+A list of modules to use by default for this submodule type. This gets combined
+with all option definitions to build the final list of modules that will be included.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only options defined with this argument are included in rendered documentation.</p>
+</div>
+</li>
+<li><p class="first"><em>specialArgs</em>
+An attribute set of extra arguments to be passed to the module functions.
+The option <code class="docutils literal notranslate"><span class="pre">_module.args</span></code> should be used instead
+for most arguments since it allows overriding. <em>specialArgs</em> should only be
+used for arguments that can’t go through the module fixed-point, because of
+infinite recursion or other problems. An example is overriding the
+<code class="docutils literal notranslate"><span class="pre">lib</span></code> argument, because <code class="docutils literal notranslate"><span class="pre">lib</span></code> itself is used
+to define <code class="docutils literal notranslate"><span class="pre">_module.args</span></code>, which makes using
+<code class="docutils literal notranslate"><span class="pre">_module.args</span></code> to define it impossible.</p>
+</li>
+<li><p class="first"><em>shorthandOnlyDefinesConfig</em>
+Whether definitions of this type should default to the <code class="docutils literal notranslate"><span class="pre">config</span></code>
+section of a module (see <span class="xref std std-ref">ex-module-syntax</span>) if it is an attribute
+set. Enabling this only has a benefit when the submodule defines an option named
+<code class="docutils literal notranslate"><span class="pre">config</span></code> or <code class="docutils literal notranslate"><span class="pre">options</span></code>. In such a case it would
+allow the option to be set with <code class="docutils literal notranslate"><span class="pre">the-submodule.config</span> <span class="pre">=</span> <span class="pre">&quot;value&quot;</span></code>
+instead of requiring <code class="docutils literal notranslate"><span class="pre">the-submodule.config.config</span> <span class="pre">=</span> <span class="pre">&quot;value&quot;</span></code>.
+This is because only when modules <em>don’t</em> set the
+<code class="docutils literal notranslate"><span class="pre">config</span></code> or <code class="docutils literal notranslate"><span class="pre">options</span></code> keys, all keys are interpreted
+as option definitions in the <code class="docutils literal notranslate"><span class="pre">config</span></code> section. Enabling this option
+implicitly puts all attributes in the <code class="docutils literal notranslate"><span class="pre">config</span></code> section.</p>
+<p>With this option enabled, defining a non-<code class="docutils literal notranslate"><span class="pre">config</span></code> section requires
+using a function: <code class="docutils literal notranslate"><span class="pre">the-submodule</span> <span class="pre">=</span> <span class="pre">{</span> <span class="pre">...</span> <span class="pre">}:</span> <span class="pre">{</span> <span class="pre">options</span> <span class="pre">=</span> <span class="pre">{</span> <span class="pre">...</span> <span class="pre">};</span> <span class="pre">}</span></code>.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="composed-types">
+<span id="sec-option-types-composed"></span><h1>Composed Types<a class="headerlink" href="#composed-types" title="Permalink to this headline">¶</a></h1>
+<p>Composed types are types that take a type as parameter. <code class="docutils literal notranslate"><span class="pre">listOf</span>
+<span class="pre">int</span></code> and <code class="docutils literal notranslate"><span class="pre">either</span> <span class="pre">int</span> <span class="pre">str</span></code> are examples of composed
+types.</p>
+<p><code class="docutils literal notranslate"><span class="pre">types.listOf</span></code> <em>t</em></p>
+<blockquote>
+<div>A list of <em>t</em> type, e.g. <code class="docutils literal notranslate"><span class="pre">types.listOf</span>
+<span class="pre">int</span></code>. Multiple definitions are merged with list concatenation.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.attrsOf</span></code> <em>t</em></p>
+<blockquote>
+<div><p>An attribute set of where all the values are of
+<em>t</em> type. Multiple definitions result in the
+joined attribute set.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This type is <em>strict</em> in its values, which in turn
+means attributes cannot depend on other attributes. See <code class="docutils literal notranslate"><span class="pre">types.lazyAttrsOf</span></code> for a lazy version.</p>
+</div>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.lazyAttrsOf</span></code> <em>t</em></p>
+<blockquote>
+<div><p>An attribute set of where all the values are of
+<em>t</em> type. Multiple definitions result in the
+joined attribute set. This is the lazy version of <code class="docutils literal notranslate"><span class="pre">types.attrsOf</span></code>, allowing attributes to depend on each other.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This version does not fully support conditional definitions! With an
+option <code class="docutils literal notranslate"><span class="pre">foo</span></code> of this type and a definition
+<code class="docutils literal notranslate"><span class="pre">foo.attr</span> <span class="pre">=</span> <span class="pre">lib.mkIf</span> <span class="pre">false</span> <span class="pre">10</span></code>, evaluating
+<code class="docutils literal notranslate"><span class="pre">foo</span> <span class="pre">?</span> <span class="pre">attr</span></code> will return <code class="docutils literal notranslate"><span class="pre">true</span></code>
+even though it should be false. Accessing the value will then throw
+an error. For types <em>t</em> that have an
+<code class="docutils literal notranslate"><span class="pre">emptyValue</span></code> defined, that value will be returned
+instead of throwing an error. So if the type of <code class="docutils literal notranslate"><span class="pre">foo.attr</span></code>
+was <code class="docutils literal notranslate"><span class="pre">lazyAttrsOf</span> <span class="pre">(nullOr</span> <span class="pre">int)</span></code>, <code class="docutils literal notranslate"><span class="pre">null</span></code>
+would be returned instead for the same <code class="docutils literal notranslate"><span class="pre">mkIf</span> <span class="pre">false</span></code> definition.</p>
+</div>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.loaOf</span></code> <em>t</em></p>
+<blockquote>
+<div>An attribute set or a list of <em>t</em> type. Multiple
+definitions are merged according to the value.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.nullOr</span></code> <em>t</em></p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">null</span></code> or type <em>t</em>. Multiple
+definitions are merged according to type <em>t</em>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.uniq</span></code> <em>t</em></p>
+<blockquote>
+<div>Ensures that type <em>t</em> cannot be merged. It is
+used to ensure option definitions are declared only once.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.either</span></code> <em>t1</em> <em>t2</em></p>
+<blockquote>
+<div>Type <em>t1</em> or type <em>t2</em>,
+e.g. <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">types;</span> <span class="pre">either</span> <span class="pre">int</span> <span class="pre">str</span></code>. Multiple definitions
+cannot be merged.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.oneOf</span></code> [ <em>t1</em> <em>t2</em> … ]</p>
+<blockquote>
+<div>Type <em>t1</em> or type <em>t2</em> and so forth,
+e.g. <code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">types;</span> <span class="pre">oneOf</span> <span class="pre">[</span> <span class="pre">int</span> <span class="pre">str</span> <span class="pre">bool</span> <span class="pre">]</span></code>. Multiple definitions
+cannot be merged.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">types.coercedTo</span></code> <em>from</em> <em>f</em> <em>to</em></p>
+<blockquote>
+<div>Type <em>to</em> or type
+<em>from</em> which will be coerced to type
+<em>to</em> using function <em>f</em>
+which takes an argument of type <em>from</em> and
+return a value of type <em>to</em>. Can be used to
+preserve backwards compatibility of an option if its type was changed.</div></blockquote>
+</div>
+<div class="section" id="submodule">
+<span id="section-option-types-submodule"></span><h1>Submodule<a class="headerlink" href="#submodule" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">submodule</span></code> is a very powerful type that defines a set of
+sub-options that are handled like a separate module.</p>
+<p>It takes a parameter <em>o</em>, that should be a set, or
+a function returning a set with an <code class="docutils literal notranslate"><span class="pre">options</span></code> key defining
+the sub-options. Submodule option definitions are type-checked accordingly
+to the <code class="docutils literal notranslate"><span class="pre">options</span></code> declarations. Of course, you can nest
+submodule option definitons for even higher modularity.</p>
+<p>The option set can be defined directly
+(<span class="xref std std-ref">ex-submodule-direct</span>) or as reference
+(<span class="xref std std-ref">ex-submodule-reference</span>).</p>
+<div class="section" id="directly-defined-submodule">
+<h2>Directly defined submodule<a class="headerlink" href="#directly-defined-submodule" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="o">.</span><span class="n">mod</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;submodule example&quot;</span><span class="p">;</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="k">with</span> <span class="n">types</span><span class="p">;</span> <span class="n">submodule</span> <span class="p">{</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="n">bar</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="p">};</span>
+<span class="p">};</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="submodule-defined-as-a-reference">
+<h2>Submodule defined as a reference<a class="headerlink" href="#submodule-defined-as-a-reference" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">let</span>
+<span class="n">modOptions</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="n">bar</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="p">};</span>
+<span class="p">};</span>
+<span class="ow">in</span>
+<span class="n">options</span><span class="o">.</span><span class="n">mod</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;submodule example&quot;</span><span class="p">;</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="k">with</span> <span class="n">types</span><span class="p">;</span> <span class="n">submodule</span> <span class="n">modOptions</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">submodule</span></code> type is especially interesting when used
+with composed types like <code class="docutils literal notranslate"><span class="pre">attrsOf</span></code> or
+<code class="docutils literal notranslate"><span class="pre">listOf</span></code>. When composed with <code class="docutils literal notranslate"><span class="pre">listOf</span></code>
+(<span class="xref std std-ref">ex-submodule-listof-declaration</span>),
+<code class="docutils literal notranslate"><span class="pre">submodule</span></code> allows multiple definitions of the submodule
+option set (<span class="xref std std-ref">ex-submodule-listof-definition</span>).</p>
+</div>
+<div class="section" id="declaration-of-a-list-of-submodules">
+<h2>Declaration of a list of submodules<a class="headerlink" href="#declaration-of-a-list-of-submodules" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="o">.</span><span class="n">mod</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;submodule example&quot;</span><span class="p">;</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="k">with</span> <span class="n">types</span><span class="p">;</span> <span class="n">listOf</span> <span class="p">(</span><span class="n">submodule</span> <span class="p">{</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="n">bar</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="p">};</span>
+<span class="p">});</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="definition-of-a-list-of-submodules">
+<h2>Definition of a list of submodules<a class="headerlink" href="#definition-of-a-list-of-submodules" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">mod</span> <span class="o">=</span> <span class="p">[</span>
+<span class="p">{</span> <span class="n">foo</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">bar</span> <span class="o">=</span> <span class="s2">&quot;one&quot;</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">{</span> <span class="n">foo</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">bar</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">];</span>
+</pre></div>
+</div>
+<p>When composed with <code class="docutils literal notranslate"><span class="pre">attrsOf</span></code>
+(<span class="xref std std-ref">ex-submodule-attrsof-declaration</span>),
+<code class="docutils literal notranslate"><span class="pre">submodule</span></code> allows multiple named definitions of the
+submodule option set (<span class="xref std std-ref">ex-submodule-attrsof-definition</span>).</p>
+</div>
+<div class="section" id="declaration-of-attribute-sets-of-submodules">
+<h2>Declaration of attribute sets of submodules<a class="headerlink" href="#declaration-of-attribute-sets-of-submodules" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="o">.</span><span class="n">mod</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;submodule example&quot;</span><span class="p">;</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="k">with</span> <span class="n">types</span><span class="p">;</span> <span class="n">attrsOf</span> <span class="p">(</span><span class="n">submodule</span> <span class="p">{</span>
+<span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="nb">int</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="n">bar</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="p">};</span>
+<span class="p">});</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>Declaration of attribute sets of submodules<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">mod</span><span class="o">.</span><span class="n">one</span> <span class="o">=</span> <span class="p">{</span> <span class="n">foo</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">bar</span> <span class="o">=</span> <span class="s2">&quot;one&quot;</span><span class="p">;</span> <span class="p">};</span>
+<span class="n">config</span><span class="o">.</span><span class="n">mod</span><span class="o">.</span><span class="n">two</span> <span class="o">=</span> <span class="p">{</span> <span class="n">foo</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span> <span class="n">bar</span> <span class="o">=</span> <span class="s2">&quot;two&quot;</span><span class="p">;</span> <span class="p">};</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="extending-types">
+<span id="sec-option-types-extending"></span><h1>Extending types<a class="headerlink" href="#extending-types" title="Permalink to this headline">¶</a></h1>
+<p>Types are mainly characterized by their <code class="docutils literal notranslate"><span class="pre">check</span></code> and
+<code class="docutils literal notranslate"><span class="pre">merge</span></code> functions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">check</span></code></p>
+<blockquote>
+<div><p>The function to type check the value. Takes a value as parameter and
+return a boolean. It is possible to extend a type check with the
+<code class="docutils literal notranslate"><span class="pre">addCheck</span></code> function
+(<span class="xref std std-ref">ex-extending-type-check-1</span>), or to fully
+override the check function
+(<span class="xref std std-ref">ex-extending-type-check-2</span>).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">byte</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;An integer between 0 and 255.&quot;</span><span class="p">;</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">addCheck</span> <span class="n">types</span><span class="o">.</span><span class="n">int</span> <span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="mi">255</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nixThings</span> <span class="o">=</span> <span class="n">mkOption</span> <span class="p">{</span>
+<span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;words that start with &#39;nix&#39;&quot;</span><span class="p">;</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">str</span> <span class="o">//</span> <span class="p">{</span>
+<span class="n">check</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">lib</span><span class="o">.</span><span class="n">hasPrefix</span> <span class="s2">&quot;nix&quot;</span> <span class="n">x</span><span class="p">)</span>
+<span class="p">};</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">merge</span></code></p>
+<blockquote>
+<div>Function to merge the options values when multiple values are set. The
+function takes two parameters, <code class="docutils literal notranslate"><span class="pre">loc</span></code> the option path as
+a list of strings, and <code class="docutils literal notranslate"><span class="pre">defs</span></code> the list of defined values
+as a list. It is possible to override a type merge function for custom
+needs.</div></blockquote>
+</div>
+<div class="section" id="custom-types">
+<span id="sec-option-types-custom"></span><h1>Custom Types<a class="headerlink" href="#custom-types" title="Permalink to this headline">¶</a></h1>
+<p>Custom types can be created with the <code class="docutils literal notranslate"><span class="pre">mkOptionType</span></code>
+function. As type creation includes some more complex topics such as
+submodule handling, it is recommended to get familiar with
+<a class="reference external" href="https://github.com/NixOS/nixpkgs/blob/master/lib/types.nix">types.nix</a>
+code before creating a new type.</p>
+<p>The only required parameter is <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">name</span></code></p>
+<blockquote>
+<div>A string representation of the type function name.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">definition</span></code></p>
+<blockquote>
+<div>Description of the type used in documentation. Give information of the
+type and any of its arguments.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">check</span></code></p>
+<blockquote>
+<div>A function to type check the definition value. Takes the definition value
+as a parameter and returns a boolean indicating the type check result,
+<code class="docutils literal notranslate"><span class="pre">true</span></code> for success and <code class="docutils literal notranslate"><span class="pre">false</span></code> for
+failure.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">merge</span></code></p>
+<blockquote>
+<div><p>A function to merge multiple definitions values. Takes two parameters:</p>
+<p><em>loc</em></p>
+<blockquote>
+<div>The option path as a list of strings, e.g. <code class="docutils literal notranslate"><span class="pre">[&quot;boot&quot;</span> <span class="pre">&quot;loader</span>
+<span class="pre">&quot;grub&quot;</span> <span class="pre">&quot;enable&quot;]</span></code>.</div></blockquote>
+<p><em>defs</em></p>
+<blockquote>
+<div>The list of sets of defined <code class="docutils literal notranslate"><span class="pre">value</span></code> and
+<code class="docutils literal notranslate"><span class="pre">file</span></code> where the value was defined, e.g. <code class="docutils literal notranslate"><span class="pre">[</span> <span class="pre">{</span>
+<span class="pre">file</span> <span class="pre">=</span> <span class="pre">&quot;/foo.nix&quot;;</span> <span class="pre">value</span> <span class="pre">=</span> <span class="pre">1;</span> <span class="pre">}</span> <span class="pre">{</span> <span class="pre">file</span> <span class="pre">=</span> <span class="pre">&quot;/bar.nix&quot;;</span> <span class="pre">value</span> <span class="pre">=</span> <span class="pre">2</span> <span class="pre">}</span>
+<span class="pre">]</span></code>. The <code class="docutils literal notranslate"><span class="pre">merge</span></code> function should return the
+merged value or throw an error in case the values are impossible or
+not meant to be merged.</div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">getSubOptions</span></code></p>
+<blockquote>
+<div>For composed types that can take a submodule as type parameter, this
+function generate sub-options documentation. It takes the current option
+prefix as a list and return the set of sub-options. Usually defined in a
+recursive manner by adding a term to the prefix, e.g. <code class="docutils literal notranslate"><span class="pre">prefix:</span>
+<span class="pre">elemType.getSubOptions</span> <span class="pre">(prefix</span> <span class="pre">++</span>
+<span class="pre">[*&quot;prefix&quot;*])</span></code> where
+<em>“prefix”</em> is the newly added prefix.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">getSubModules</span></code></p>
+<blockquote>
+<div>For composed types that can take a submodule as type parameter, this
+function should return the type parameters submodules. If the type
+parameter is called <code class="docutils literal notranslate"><span class="pre">elemType</span></code>, the function should just
+recursively look into submodules by returning
+<code class="docutils literal notranslate"><span class="pre">elemType.getSubModules;</span></code>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">substSubModules</span></code></p>
+<blockquote>
+<div>For composed types that can take a submodule as type parameter, this
+function can be used to substitute the parameter of a submodule type. It
+takes a module as parameter and return the type with the submodule
+options substituted. It is usually defined as a type function call with a
+recursive call to <code class="docutils literal notranslate"><span class="pre">substSubModules</span></code>, e.g for a type
+<code class="docutils literal notranslate"><span class="pre">composedType</span></code> that take an <code class="docutils literal notranslate"><span class="pre">elemtype</span></code>
+type parameter, this function should be defined as <code class="docutils literal notranslate"><span class="pre">m:</span>
+<span class="pre">composedType</span> <span class="pre">(elemType.substSubModules</span> <span class="pre">m)</span></code>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">typeMerge</span></code></p>
+<blockquote>
+<div><p>A function to merge multiple type declarations. Takes the type to merge
+<code class="docutils literal notranslate"><span class="pre">functor</span></code> as parameter. A <code class="docutils literal notranslate"><span class="pre">null</span></code> return
+value means that type cannot be merged.</p>
+<p><em>f</em></p>
+<blockquote>
+<div>The type to merge <code class="docutils literal notranslate"><span class="pre">functor</span></code>.</div></blockquote>
+<p>Note: There is a generic <code class="docutils literal notranslate"><span class="pre">defaultTypeMerge</span></code> that work
+with most of value and composed types.</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">functor</span></code></p>
+<blockquote>
+<div><p>An attribute set representing the type. It is used for type operations
+and has the following keys:</p>
+<p><code class="docutils literal notranslate"><span class="pre">type</span></code></p>
+<blockquote>
+<div>The type function.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">wrapped</span></code></p>
+<blockquote>
+<div>Holds the type parameter for composed types.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">payload</span></code></p>
+<blockquote>
+<div>Holds the value parameter for value types. The types that have a
+<code class="docutils literal notranslate"><span class="pre">payload</span></code> are the <code class="docutils literal notranslate"><span class="pre">enum</span></code>,
+<code class="docutils literal notranslate"><span class="pre">separatedString</span></code> and <code class="docutils literal notranslate"><span class="pre">submodule</span></code>
+types.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">binOp</span></code></p>
+<blockquote>
+<div>A binary operation that can merge the payloads of two same types.
+Defined as a function that take two payloads as parameters and return
+the payloads merged.</div></blockquote>
+</div></blockquote>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="development.xml.html">Development</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sources.xml.html">Getting the Sources</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="writing-modules.xml.html">Writing NixOS Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building-parts.xml.html">Building Specific Parts of NixOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-documentation.xml.html">Writing NixOS Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building-nixos.xml.html">Building Your Own NixOS CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nixos-tests.xml.html">NixOS Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing-installer.xml.html">Testing the Installer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.xml.html">Releases</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="development.xml.html">Development</a><ul>
+  <li><a href="writing-modules.xml.html">Writing NixOS Modules</a><ul>
+      <li>Previous: <a href="option-declarations.xml.html" title="previous chapter">Option Declarations</a></li>
+      <li>Next: <a href="option-def.xml.html" title="next chapter">Option Definitions</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/development/option-types.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

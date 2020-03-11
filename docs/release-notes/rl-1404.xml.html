@@ -1,0 +1,228 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Release 14.04 (“Baboon”, 2014/04/30) &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="release-14-04-baboon-2014-04-30">
+<span id="sec-release-14-04"></span><h1>Release 14.04 (“Baboon”, 2014/04/30)<a class="headerlink" href="#release-14-04-baboon-2014-04-30" title="Permalink to this headline">¶</a></h1>
+<p>This is the second stable release branch of NixOS. In addition to numerous
+new and upgraded packages and modules, this release has the following
+highlights:</p>
+<ul>
+<li><p class="first">Installation on UEFI systems is now supported. See
+<a class="reference internal" href="../installation/installing.xml.html#sec-installation"><span class="std std-ref">Installing NixOS</span></a> for details.</p>
+</li>
+<li><p class="first">Systemd has been updated to version 212, which has
+<a class="reference external" href="http://cgit.freedesktop.org/systemd/systemd/plain/NEWS?id=v212">numerous
+improvements</a>. NixOS now automatically starts systemd user instances
+when you log in. You can define global user units through the
+options.</p>
+</li>
+<li><p class="first">NixOS is now based on Glibc 2.19 and GCC 4.8.</p>
+</li>
+<li><p class="first">The default Linux kernel has been updated to 3.12.</p>
+</li>
+<li><p class="first">KDE has been updated to 4.12.</p>
+</li>
+<li><p class="first">GNOME 3.10 experimental support has been added.</p>
+</li>
+<li><p class="first">Nix has been updated to 1.7
+(<a class="reference external" href="http://nixos.org/nix/manual/#ssec-relnotes-1.7">details</a>).</p>
+</li>
+<li><p class="first">NixOS now supports fully declarative management of users and groups. If
+you set to <code class="docutils literal notranslate"><span class="pre">false</span></code>,
+then the contents of <code class="file docutils literal notranslate"><span class="pre">/etc/passwd</span></code> and
+<code class="file docutils literal notranslate"><span class="pre">/etc/group</span></code> will be
+<a class="reference external" href="https://www.usenix.org/legacy/event/lisa02/tech/full_papers/traugott/traugott_html/">congruent</a>
+to your NixOS configuration. For instance, if you remove a user from
+and run
+<strong class="command">nixos-rebuild</strong>, the user account will cease to exist.
+Also, imperative commands for managing users and groups, such as
+<strong class="command">useradd</strong>, are no longer available. If
+is <code class="docutils literal notranslate"><span class="pre">true</span></code> (the
+default), then behaviour is unchanged from NixOS 13.10.</p>
+</li>
+<li><p class="first">NixOS now has basic container support, meaning you can easily run a NixOS
+instance as a container in a NixOS host system. These containers are
+suitable for testing and experimentation but not production use, since
+they’re not fully isolated from the host. See
+<a class="reference internal" href="../administration/containers.xml.html#ch-containers"><span class="std std-ref">Container Management</span></a> for details.</p>
+</li>
+<li><p class="first">Systemd units provided by packages can now be overridden from the NixOS
+configuration. For instance, if a package <code class="docutils literal notranslate"><span class="pre">foo</span></code> provides
+systemd units, you can say:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">systemd</span><span class="o">.</span><span class="n">packages</span> <span class="o">=</span> <span class="p">[</span> <span class="n">pkgs</span><span class="o">.</span><span class="n">foo</span> <span class="p">];</span>
+</pre></div>
+</div>
+<p>to enable those units. You can then set or override unit options in the
+usual way, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">systemd</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">wantedBy</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;multi-user.target&quot;</span> <span class="p">];</span>
+<span class="n">systemd</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">serviceConfig</span><span class="o">.</span><span class="n">MemoryLimit</span> <span class="o">=</span> <span class="s2">&quot;512M&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>When upgrading from a previous release, please be aware of the following
+incompatible changes:</p>
+<ul>
+<li><p class="first">Nixpkgs no longer exposes unfree packages by default. If your NixOS
+configuration requires unfree packages from Nixpkgs, you need to enable
+support for them explicitly by setting:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nixpkgs</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">allowUnfree</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Otherwise, you get an error message such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>error: package ‘nvidia-x11-331.49-3.12.17’ in ‘…/nvidia-x11/default.nix:56’
+has an unfree license, refusing to evaluate
+</pre></div>
+</div>
+</li>
+<li><p class="first">The Adobe Flash player is no longer enabled by default in the Firefox and
+Chromium wrappers. To enable it, you must set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nixpkgs</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">allowUnfree</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+<span class="n">nixpkgs</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">firefox</span><span class="o">.</span><span class="n">enableAdobeFlash</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span> <span class="c1"># for Firefox</span>
+<span class="n">nixpkgs</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">chromium</span><span class="o">.</span><span class="n">enableAdobeFlash</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span> <span class="c1"># for Chromium</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The firewall is now enabled by default. If you don’t want this, you need
+to disable it explicitly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">networking</span><span class="o">.</span><span class="n">firewall</span><span class="o">.</span><span class="n">enable</span> <span class="o">=</span> <span class="n">false</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The option has been renamed to
+.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">mysql55</span></code> service has been merged into the
+<code class="docutils literal notranslate"><span class="pre">mysql</span></code> service, which no longer sets a default for the
+option .</p>
+</li>
+<li><p class="first">Package variants are now differentiated by suffixing the name, rather than
+the version. For instance, <code class="file docutils literal notranslate"><span class="pre">sqlite-3.8.4.3-interactive</span></code>
+is now called <code class="file docutils literal notranslate"><span class="pre">sqlite-interactive-3.8.4.3</span></code>. This
+ensures that <code class="docutils literal notranslate"><span class="pre">nix-env</span> <span class="pre">-i</span> <span class="pre">sqlite</span></code> is unambiguous, and that
+<code class="docutils literal notranslate"><span class="pre">nix-env</span> <span class="pre">-u</span></code> won’t “upgrade”
+<code class="docutils literal notranslate"><span class="pre">sqlite</span></code> to <code class="docutils literal notranslate"><span class="pre">sqlite-interactive</span></code> or vice
+versa. Notably, this change affects the Firefox wrapper (which provides
+plugins), as it is now called <code class="docutils literal notranslate"><span class="pre">firefox-wrapper</span></code>. So when
+using <strong class="command">nix-env</strong>, you should do <code class="docutils literal notranslate"><span class="pre">nix-env</span> <span class="pre">-e</span>
+<span class="pre">firefox;</span> <span class="pre">nix-env</span> <span class="pre">-i</span> <span class="pre">firefox-wrapper</span></code> if you want to keep using
+the wrapper. This change does not affect declarative package management,
+since attribute names like <code class="docutils literal notranslate"><span class="pre">pkgs.firefoxWrapper</span></code> were
+already unambiguous.</p>
+</li>
+<li><p class="first">The symlink <code class="file docutils literal notranslate"><span class="pre">/etc/ca-bundle.crt</span></code> is gone. Programs
+should instead use the environment variable
+OPENSSL_X509_CERT_FILE (which points to
+<code class="file docutils literal notranslate"><span class="pre">/etc/ssl/certs/ca-bundle.crt</span></code>).</p>
+</li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/release-notes/rl-1404.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,174 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Declarative Container Specification &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Container Networking" href="container-networking.xml.html" />
+    <link rel="prev" title="Imperative Container Management" href="imperative-containers.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="declarative-container-specification">
+<span id="sec-declarative-containers"></span><h1>Declarative Container Specification<a class="headerlink" href="#declarative-container-specification" title="Permalink to this headline">¶</a></h1>
+<p>You can also specify containers and their configuration in the host’s
+<code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code>. For example, the following specifies
+that there shall be a container named <code class="docutils literal notranslate"><span class="pre">database</span></code> running
+PostgreSQL:</p>
+<pre class="literal-block">
+containers.database =
+  { config =
+      { config, pkgs, ... }:
+      { <a class="reference internal" href="../generated/options-db.xml.html#opt-services-postgresql-enable"><span class="std std-ref">services.postgresql.enable</span></a>  = true;
+      <a class="reference internal" href="../generated/options-db.xml.html#opt-services-postgresql-package"><span class="std std-ref">services.postgresql.package</span></a>  = pkgs.postgresql_9_6;
+      };
+  };
+</pre>
+<p>If you run <code class="docutils literal notranslate"><span class="pre">nixos-rebuild</span> <span class="pre">switch</span></code>, the container will be
+built. If the container was already running, it will be updated in place,
+without rebooting. The container can be configured to start automatically by
+setting <code class="docutils literal notranslate"><span class="pre">containers.database.autoStart</span> <span class="pre">=</span> <span class="pre">true</span></code> in its
+configuration.</p>
+<p>By default, declarative containers share the network namespace of the host,
+meaning that they can listen on (privileged) ports. However, they cannot
+change the network configuration. You can give a container its own network as
+follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>containers.database = {
+  `privateNetwork &lt;None&gt;`_  = true;
+  `hostAddress &lt;None&gt;`_  = &quot;192.168.100.10&quot;;
+  `localAddress &lt;None&gt;`_  = &quot;192.168.100.11&quot;;
+};
+</pre></div>
+</div>
+<p>This gives the container a private virtual Ethernet interface with IP address
+<code class="docutils literal notranslate"><span class="pre">192.168.100.11</span></code>, which is hooked up to a virtual Ethernet
+interface on the host with IP address <code class="docutils literal notranslate"><span class="pre">192.168.100.10</span></code>. (See
+the next section for details on container networking.)</p>
+<p>To disable the container, just remove it from
+<code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code> and run <code class="docutils literal notranslate"><span class="pre">nixos-rebuild</span>
+<span class="pre">switch</span></code>. Note that this will not delete the root directory of the
+container in <code class="docutils literal notranslate"><span class="pre">/var/lib/containers</span></code>. Containers can be
+destroyed using the imperative method: <code class="docutils literal notranslate"><span class="pre">nixos-container</span> <span class="pre">destroy</span>
+<span class="pre">foo</span></code>.</p>
+<p>Declarative containers can be started and stopped using the corresponding
+systemd service, e.g. <code class="docutils literal notranslate"><span class="pre">systemctl</span> <span class="pre">start</span> <span class="pre">container&#64;database</span></code>.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="running.xml.html">Administration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="service-mgmt.xml.html">Service Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rebooting.xml.html">Rebooting and Shutting Down</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-sessions.xml.html">User Sessions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-groups.xml.html">Control Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.xml.html">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cleaning-store.xml.html">Cleaning the Nix Store</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="containers.xml.html">Container Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.xml.html">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="running.xml.html">Administration</a><ul>
+  <li><a href="containers.xml.html">Container Management</a><ul>
+      <li>Previous: <a href="imperative-containers.xml.html" title="previous chapter">Imperative Container Management</a></li>
+      <li>Next: <a href="container-networking.xml.html" title="next chapter">Container Networking</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/administration/declarative-containers.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

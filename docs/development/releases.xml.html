@@ -1,0 +1,255 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Releases &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration Options" href="../generated/options-db.xml.html" />
+    <link rel="prev" title="Testing the Installer" href="testing-installer.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="releases">
+<span id="ch-releases"></span><h1>Releases<a class="headerlink" href="#releases" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-process">
+<span id="id1"></span><h2>Release process<a class="headerlink" href="#release-process" title="Permalink to this headline">¶</a></h2>
+<p>Going through an example of releasing NixOS 17.09:</p>
+</div>
+<div class="section" id="one-month-before-the-beta">
+<span id="id2"></span><h2>One month before the beta<a class="headerlink" href="#one-month-before-the-beta" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Send an email to the nix-devel mailinglist as a warning about upcoming
+beta “feature freeze” in a month.</li>
+<li>Discuss with Eelco Dolstra and the community (via IRC, ML) about what
+will reach the deadline. Any issue or Pull Request targeting the release
+should be included in the release milestone.</li>
+</ul>
+</div>
+<div class="section" id="at-beta-release-time">
+<span id="id3"></span><h2>At beta release time<a class="headerlink" href="#at-beta-release-time" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/NixOS/nixpkgs/issues/13559">Create
+an issue for tracking Zero Hydra Failures progress. ZHF is an effort to
+get build failures down to zero.</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">-a</span> <span class="pre">-s</span> <span class="pre">-m</span> <span class="pre">&quot;Release</span> <span class="pre">17.09-beta&quot;</span> <span class="pre">17.09-beta</span>
+<span class="pre">&amp;&amp;</span> <span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">17.09-beta</span></code></li>
+<li>From the master branch run <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">-b</span>
+<span class="pre">release-17.09</span></code>.</li>
+<li><a class="reference external" href="https://github.com/NixOS/nixos-org-configurations/pull/18">Make sure a channel is created at http://nixos.org/channels/.</a></li>
+<li><a class="reference external" href="https://github.com/NixOS/nixpkgs/compare/bdf161ed8d21...6b63c4616790">Bump the system.defaultChannel attribute in
+nixos/modules/misc/version.nix</a></li>
+<li><a class="reference external" href="https://github.com/NixOS/nixpkgs/commit/d6b08acd1ccac0d9d502c4b635e00b04d3387f06">Update versionSuffix in
+nixos/release.nix</a>, use
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rev-list</span> <span class="pre">--count</span> <span class="pre">17.09-beta</span></code>
+to get the commit count.</li>
+<li><code class="docutils literal notranslate"><span class="pre">echo</span> <span class="pre">-n</span> <span class="pre">&quot;18.03&quot;</span> <span class="pre">&gt;</span> <span class="pre">.version</span></code> on master.</li>
+<li><a class="reference external" href="https://github.com/NixOS/nixpkgs/commit/b8a4095003e27659092892a4708bb3698231a842">Pick a new name for the unstable branch.</a></li>
+<li>Create a new release notes file for the upcoming release + 1, in this
+case <code class="docutils literal notranslate"><span class="pre">rl-1803.xml</span></code>.</li>
+<li>Create two Hydra jobsets: release-17.09 and release-17.09-small with
+<code class="docutils literal notranslate"><span class="pre">stableBranch</span></code> set to false.</li>
+<li>Remove attributes that we know we will not be able to support,
+especially if there is a stable alternative. E.g. Check that our
+Linux kernels’
+<a class="reference external" href="https://www.kernel.org/category/releases.html">projected end-of-life</a> are after our release projected
+end-of-life</li>
+<li>Edit changelog at
+<code class="docutils literal notranslate"><span class="pre">nixos/doc/manual/release-notes/rl-1709.xml</span></code> (double
+check desktop versions are noted)<ul>
+<li>Get all new NixOS modules <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">diff</span>
+<span class="pre">release-17.03..release-17.09</span> <span class="pre">nixos/modules/module-list.nix|grep</span>
+<span class="pre">^+</span></code></li>
+<li>Note systemd, kernel, glibc and Nix upgrades.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="during-beta">
+<span id="id4"></span><h2>During Beta<a class="headerlink" href="#during-beta" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Monitor the master branch for bugfixes and minor updates and cherry-pick
+them to the release branch.</li>
+</ul>
+</div>
+<div class="section" id="before-the-final-release">
+<span id="id5"></span><h2>Before the final release<a class="headerlink" href="#before-the-final-release" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Re-check that the release notes are complete.</li>
+<li>Release Nix (currently only Eelco Dolstra can do that).
+<a class="reference external" href="https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/installer/tools/nix-fallback-paths.nix">Make sure fallback is updated.</a></li>
+<li><a class="reference external" href="https://github.com/NixOS/nixpkgs/commit/40fd9ae3ac8048758abdcfc7d28a78b5f22fe97e">Update README.md with new stable NixOS version information.</a></li>
+<li>Change <code class="docutils literal notranslate"><span class="pre">stableBranch</span></code> to <code class="docutils literal notranslate"><span class="pre">true</span></code> in Hydra and wait for
+the channel to update.</li>
+</ul>
+</div>
+<div class="section" id="at-final-release-time">
+<span id="id6"></span><h2>At final release time<a class="headerlink" href="#at-final-release-time" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">-s</span> <span class="pre">-a</span> <span class="pre">-m</span> <span class="pre">&quot;Release</span> <span class="pre">15.09&quot;</span> <span class="pre">15.09</span></code></li>
+<li>Update “Chapter 4. Upgrading NixOS” section of the manual to match
+new stable release version.</li>
+<li>Update the
+<a class="reference external" href="https://github.com/NixOS/nixos-homepage/commit/2a37975d5a617ecdfca94696242b6f32ffcba9f1">NIXOS_SERIES</a>
+in the
+<a class="reference external" href="https://github.com/NixOS/nixos-homepage">nixos-homepage</a>
+repository.</li>
+<li>Get number of commits for the release: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span>
+<span class="pre">release-14.04..release-14.12</span> <span class="pre">--format=%an|wc</span> <span class="pre">-l</span></code></li>
+<li>Commits by contributor: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span> <span class="pre">release-14.04..release-14.12</span>
+<span class="pre">--format=%an|sort|uniq</span> <span class="pre">-c|sort</span> <span class="pre">-rn</span></code></li>
+<li>Create a new topic on <a class="reference external" href="https://discourse.nixos.org/">the
+Discourse instance</a> to announce the release with the above information.
+Best to check how previous email was formulated to see what needs to be
+included.</li>
+</ul>
+</div>
+<div class="section" id="release-management-team">
+<span id="release-managers"></span><h2>Release Management Team<a class="headerlink" href="#release-management-team" title="Permalink to this headline">¶</a></h2>
+<p>For each release there are two release managers. After each release the
+release manager having managed two releases steps down and the release
+management team of the last release appoints a new release manager.</p>
+<p>This makes sure a release management team always consists of one release
+manager who already has managed one release and one release manager being
+introduced to their role, making it easier to pass on knowledge and
+experience.</p>
+<p>Release managers for the current NixOS release are tracked by GitHub team
+<a class="reference external" href="https://github.com/orgs/NixOS/teams/nixos-release-managers/members">&#64;NixOS/nixos-release-managers</a>.</p>
+<p>A release manager’s role and responsibilities are:</p>
+<ul class="simple">
+<li>manage the release process</li>
+<li>start discussions about features and changes for a given release</li>
+<li>create a roadmap</li>
+<li>release in cooperation with Eelco Dolstra</li>
+<li>decide which bug fixes, features, etc… get backported after a release</li>
+</ul>
+</div>
+<div class="section" id="release-schedule">
+<span id="id7"></span><h2>Release schedule<a class="headerlink" href="#release-schedule" title="Permalink to this headline">¶</a></h2>
+<p>Date</p>
+<p>Event</p>
+<p>2016-07-25</p>
+<p>Send email to nix-dev about upcoming branch-off</p>
+<p>2016-09-01</p>
+<p><code class="docutils literal notranslate"><span class="pre">release-16.09</span></code> branch and corresponding jobsets are created,
+change freeze</p>
+<p>2016-09-30</p>
+<p>NixOS 16.09 released</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="development.xml.html">Development</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sources.xml.html">Getting the Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-modules.xml.html">Writing NixOS Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building-parts.xml.html">Building Specific Parts of NixOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-documentation.xml.html">Writing NixOS Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building-nixos.xml.html">Building Your Own NixOS CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nixos-tests.xml.html">NixOS Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing-installer.xml.html">Testing the Installer</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Releases</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="development.xml.html">Development</a><ul>
+      <li>Previous: <a href="testing-installer.xml.html" title="previous chapter">Testing the Installer</a></li>
+      <li>Next: <a href="../generated/options-db.xml.html" title="next chapter">Configuration Options</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/development/releases.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

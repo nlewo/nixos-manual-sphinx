@@ -1,0 +1,173 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Boot Problems &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Maintenance Mode" href="maintenance-mode.xml.html" />
+    <link rel="prev" title="Troubleshooting" href="troubleshooting.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="boot-problems">
+<span id="sec-boot-problems"></span><h1>Boot Problems<a class="headerlink" href="#boot-problems" title="Permalink to this headline">¶</a></h1>
+<p>If NixOS fails to boot, there are a number of kernel command line parameters
+that may help you to identify or fix the issue. You can add these parameters
+in the GRUB boot menu by pressing “e” to modify the selected boot entry
+and editing the line starting with <code class="docutils literal notranslate"><span class="pre">linux</span></code>. The following
+are some useful kernel command line parameters that are recognised by the
+NixOS boot scripts or by systemd:</p>
+<p><code class="docutils literal notranslate"><span class="pre">boot.shell_on_fail</span></code></p>
+<blockquote>
+<div>Start a root shell if something goes wrong in stage 1 of the boot process
+(the initial ramdisk). This is disabled by default because there is no
+authentication for the root shell.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">boot.debug1</span></code></p>
+<blockquote>
+<div>Start an interactive shell in stage 1 before anything useful has been
+done. That is, no modules have been loaded and no file systems have been
+mounted, except for <code class="file docutils literal notranslate"><span class="pre">/proc</span></code> and
+<code class="file docutils literal notranslate"><span class="pre">/sys</span></code>.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">boot.trace</span></code></p>
+<blockquote>
+<div>Print every shell command executed by the stage 1 and 2 boot scripts.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">single</span></code></p>
+<blockquote>
+<div>Boot into rescue mode (a.k.a. single user mode). This will cause systemd
+to start nothing but the unit <code class="docutils literal notranslate"><span class="pre">rescue.target</span></code>, which
+runs <strong class="command">sulogin</strong> to prompt for the root password and start
+a root login shell. Exiting the shell causes the system to continue with
+the normal boot process.</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">systemd.log_level=debug</span> <span class="pre">systemd.log_target=console</span></code></p>
+<blockquote>
+<div>Make systemd very verbose and send log messages to the console instead of
+the journal.</div></blockquote>
+<p>For more parameters recognised by systemd, see
+systemd
+1.</p>
+<p>If no login prompts or X11 login screens appear (e.g. due to hanging
+dependencies), you can press Alt+ArrowUp. If you’re lucky, this will start
+rescue mode (described above). (Also note that since most units have a
+90-second timeout before systemd gives up on them, the
+<strong class="command">agetty</strong> login prompts should appear eventually unless
+something is very wrong.)</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="running.xml.html">Administration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="service-mgmt.xml.html">Service Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rebooting.xml.html">Rebooting and Shutting Down</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-sessions.xml.html">User Sessions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-groups.xml.html">Control Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.xml.html">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cleaning-store.xml.html">Cleaning the Nix Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="containers.xml.html">Container Management</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="troubleshooting.xml.html">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="running.xml.html">Administration</a><ul>
+  <li><a href="troubleshooting.xml.html">Troubleshooting</a><ul>
+      <li>Previous: <a href="troubleshooting.xml.html" title="previous chapter">Troubleshooting</a></li>
+      <li>Next: <a href="maintenance-mode.xml.html" title="next chapter">Maintenance Mode</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/administration/boot-problems.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,165 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Container Management &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Imperative Container Management" href="imperative-containers.xml.html" />
+    <link rel="prev" title="Cleaning the Nix Store" href="cleaning-store.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="container-management">
+<span id="ch-containers"></span><h1>Container Management<a class="headerlink" href="#container-management" title="Permalink to this headline">¶</a></h1>
+<p>NixOS allows you to easily run other NixOS instances as
+<em>containers</em>. Containers are a light-weight approach to
+virtualisation that runs software in the container at the same speed as in
+the host system. NixOS containers share the Nix store of the host, making
+container creation very efficient.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Currently, NixOS containers are not perfectly isolated from the host system.
+This means that a user with root access to the container can do things that
+affect the host. So you should not give container root access to untrusted
+users.</p>
+</div>
+<p>NixOS containers can be created in two ways: imperatively, using the command
+<strong class="command">nixos-container</strong>, and declaratively, by specifying them in
+your <code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code>. The declarative approach implies
+that containers get upgraded along with your host system when you run
+<strong class="command">nixos-rebuild</strong>, which is often not what you want. By
+contrast, in the imperative approach, containers are configured and updated
+independently from the host system.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="imperative-containers.xml.html">Imperative Container Management</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="declarative-containers.xml.html">Declarative Container Specification</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="container-networking.xml.html">Container Networking</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="running.xml.html">Administration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="service-mgmt.xml.html">Service Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rebooting.xml.html">Rebooting and Shutting Down</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-sessions.xml.html">User Sessions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-groups.xml.html">Control Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.xml.html">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cleaning-store.xml.html">Cleaning the Nix Store</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Container Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.xml.html">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="running.xml.html">Administration</a><ul>
+      <li>Previous: <a href="cleaning-store.xml.html" title="previous chapter">Cleaning the Nix Store</a></li>
+      <li>Next: <a href="imperative-containers.xml.html" title="next chapter">Imperative Container Management</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/administration/containers.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

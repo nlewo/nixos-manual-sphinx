@@ -1,0 +1,409 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Description &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <p><strong class="command">nixos-rebuild</strong>
+8
+NixOS</p>
+<p><strong class="command">nixos-rebuild</strong>
+reconfigure a NixOS machine</p>
+<p>CMDSYN:  nixos-rebuild switch boot test build dry-build dry-activate edit build-vm build-vm-with-bootloader –upgrade –install-bootloader –no-build-nix –fast –rollback –builders builder-spec –flake flake-uri –profile-name -p name –show-trace -I path –verbose -v –max-jobs -j number –keep-failed -K –keep-going -k</p>
+<div class="section" id="description">
+<h1>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h1>
+<p>This command updates the system so that it corresponds to the
+configuration specified in
+<code class="file docutils literal notranslate"><span class="pre">/etc/nixos/configuration.nix</span></code> or
+<code class="file docutils literal notranslate"><span class="pre">/etc/nixos/flake.nix</span></code>. Thus, every time you
+modify the configuration or any other NixOS module, you must run
+<strong class="command">nixos-rebuild</strong> to make the changes take
+effect. It builds the new system in
+<code class="file docutils literal notranslate"><span class="pre">/nix/store</span></code>, runs its activation script, and
+stop and (re)starts any system services if needed. Please note that
+user services need to be started manually as they aren’t detected
+by the activation script at the moment.</p>
+<p>This command has one required argument, which specifies the desired
+operation. It must be one of the following:</p>
+<div class="section" id="switch">
+<span id="none"></span><h2>switch<a class="headerlink" href="#switch" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Build and activate the new configuration, and make it the boot default.
+That is, the configuration is added to the GRUB boot menu as the default
+menu entry, so that subsequent reboots will boot the system into the new
+configuration. Previous configurations activated with
+<strong class="command">nixos-rebuild switch</strong> or <strong class="command">nixos-rebuild
+boot</strong> remain available in the GRUB menu.</div></blockquote>
+</div>
+<div class="section" id="boot">
+<span id="id1"></span><h2>boot<a class="headerlink" href="#boot" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Build the new configuration and make it the boot default (as with
+<strong class="command">nixos-rebuild switch</strong>), but do not activate it. That
+is, the system continues to run the previous configuration until the
+next reboot.</div></blockquote>
+</div>
+<div class="section" id="test">
+<span id="id2"></span><h2>test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Build and activate the new configuration, but do not add it to the GRUB
+boot menu. Thus, if you reboot the system (or if it crashes), you will
+automatically revert to the default configuration (i.e. the
+configuration resulting from the last call to <strong class="command">nixos-rebuild
+switch</strong> or <strong class="command">nixos-rebuild boot</strong>).</div></blockquote>
+</div>
+<div class="section" id="build">
+<span id="id3"></span><h2>build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Build the new configuration, but neither activate it nor add it to the
+GRUB boot menu. It leaves a symlink named <code class="file docutils literal notranslate"><span class="pre">result</span></code> in
+the current directory, which points to the output of the top-level
+“system” derivation. This is essentially the same as doing</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-build /path/to/nixpkgs/nixos -A system
+</pre></div>
+</div>
+<p>Note that you do not need to be <code class="docutils literal notranslate"><span class="pre">root</span></code> to run
+<strong class="command">nixos-rebuild build</strong>.</p>
+</div></blockquote>
+</div>
+<div class="section" id="dry-build">
+<span id="id4"></span><h2>dry-build<a class="headerlink" href="#dry-build" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Show what store paths would be built or downloaded by any of the
+operations above, but otherwise do nothing.</div></blockquote>
+</div>
+<div class="section" id="dry-activate">
+<span id="id5"></span><h2>dry-activate<a class="headerlink" href="#dry-activate" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Build the new configuration, but instead of activating it, show what
+changes would be performed by the activation (i.e. by
+<strong class="command">nixos-rebuild test</strong>). For instance, this command will
+print which systemd units would be restarted. The list of changes is not
+guaranteed to be complete.</div></blockquote>
+</div>
+<div class="section" id="edit">
+<span id="id6"></span><h2>edit<a class="headerlink" href="#edit" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Opens <code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code> in the default editor.</div></blockquote>
+</div>
+<div class="section" id="build-vm">
+<span id="id7"></span><h2>build-vm<a class="headerlink" href="#build-vm" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Build a script that starts a NixOS virtual machine with the desired
+configuration. It leaves a symlink <code class="file docutils literal notranslate"><span class="pre">result</span></code> in the
+current directory that points (under
+<code class="file docutils literal notranslate"><span class="pre">result/bin/run-</span></code>)
+at the script that starts the VM. Thus, to test a NixOS configuration in
+a virtual machine, you should do the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nixos-rebuild build-vm$ ./result/bin/run-\*-vm
+</pre></div>
+</div>
+<p>The VM is implemented using the <code class="docutils literal notranslate"><span class="pre">qemu</span></code> package. For
+best performance, you should load the <code class="docutils literal notranslate"><span class="pre">kvm-intel</span></code> or
+<code class="docutils literal notranslate"><span class="pre">kvm-amd</span></code> kernel modules to get hardware
+virtualisation.</p>
+<p>The VM mounts the Nix store of the host through the 9P file system. The
+host Nix store is read-only, so Nix commands that modify the Nix store
+will not work in the VM. This includes commands such as
+<strong class="command">nixos-rebuild</strong>; to change the VM’s configuration,
+you must halt the VM and re-run the commands above.</p>
+<p>The VM has its own <code class="docutils literal notranslate"><span class="pre">ext3</span></code> root file system, which is
+automatically created when the VM is first started, and is persistent
+across reboots of the VM. It is stored in
+<code class="docutils literal notranslate"><span class="pre">./*hostname*.qcow2</span></code>.</p>
+</div></blockquote>
+</div>
+<div class="section" id="build-vm-with-bootloader">
+<span id="id8"></span><h2>build-vm-with-bootloader<a class="headerlink" href="#build-vm-with-bootloader" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Like , but boots using the regular boot loader
+of your configuration (e.g., GRUB 1 or 2), rather than booting directly
+into the kernel and initial ramdisk of the system. This allows you to
+test whether the boot loader works correctly. However, it does not
+guarantee that your NixOS configuration will boot successfully on the
+host hardware (i.e., after running <strong class="command">nixos-rebuild
+switch</strong>), because the hardware and boot loader configuration in
+the VM are different. The boot loader is installed on an automatically
+generated virtual disk containing a <code class="file docutils literal notranslate"><span class="pre">/boot</span></code>
+partition, which is mounted read-only in the VM.</div></blockquote>
+</div>
+</div>
+<div class="section" id="options">
+<h1>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h1>
+<p>This command accepts the following options:</p>
+<div class="section" id="upgrade">
+<span id="id9"></span><h2>–upgrade<a class="headerlink" href="#upgrade" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Fetch the latest version of NixOS from the NixOS channel.</div></blockquote>
+</div>
+<div class="section" id="install-bootloader">
+<span id="id10"></span><h2>–install-bootloader<a class="headerlink" href="#install-bootloader" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Causes the boot loader to be (re)installed on the device specified by the
+relevant configuration options.</div></blockquote>
+</div>
+<div class="section" id="no-build-nix">
+<span id="id11"></span><h2>–no-build-nix<a class="headerlink" href="#no-build-nix" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Normally, <strong class="command">nixos-rebuild</strong> first builds the
+<code class="docutils literal notranslate"><span class="pre">nixUnstable</span></code> attribute in Nixpkgs, and uses the
+resulting instance of the Nix package manager to build the new system
+configuration. This is necessary if the NixOS modules use features not
+provided by the currently installed version of Nix. This option disables
+building a new Nix.</div></blockquote>
+</div>
+<div class="section" id="fast">
+<span id="id12"></span><h2>–fast<a class="headerlink" href="#fast" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Equivalent to
+. This option is useful if you call
+<strong class="command">nixos-rebuild</strong> frequently (e.g. if you’re hacking on
+a NixOS module).</div></blockquote>
+</div>
+<div class="section" id="rollback">
+<span id="id13"></span><h2>–rollback<a class="headerlink" href="#rollback" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>Instead of building a new configuration as specified by
+<code class="file docutils literal notranslate"><span class="pre">/etc/nixos/configuration.nix</span></code>, roll back to the
+previous configuration. (The previous configuration is defined as the one
+before the “current” generation of the Nix profile
+<code class="file docutils literal notranslate"><span class="pre">/nix/var/nix/profiles/system</span></code>.)</div></blockquote>
+</div>
+<div class="section" id="builders">
+<span id="id14"></span><h2>–builders<a class="headerlink" href="#builders" title="Permalink to this headline">¶</a></h2>
+<p><em>builder-spec</em></p>
+<blockquote>
+<div>Allow ad-hoc remote builders for building the new system. This requires
+the user executing <strong class="command">nixos-rebuild</strong> (usually root) to be
+configured as a trusted user in the Nix daemon. This can be achieved by
+using the <code class="docutils literal notranslate"><span class="pre">nix.trustedUsers</span></code> NixOS option. Examples
+values for that option are described in the <code class="docutils literal notranslate"><span class="pre">Remote</span> <span class="pre">builds</span>
+<span class="pre">chapter</span></code> in the Nix manual, (i.e. <strong class="command">--builders
+&quot;ssh://bigbrother x86_64-linux&quot;</strong>). By specifying an empty string
+existing builders specified in <code class="file docutils literal notranslate"><span class="pre">/etc/nix/machines</span></code> can
+be ignored: <strong class="command">--builders &quot;&quot;</strong> for example when they are
+not reachable due to network connectivity.</div></blockquote>
+<p id="id15">–profile-name
+______________, .. _None:</p>
+</div>
+<div class="section" id="p">
+<h2>-p<a class="headerlink" href="#p" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Instead of using the Nix profile
+<code class="file docutils literal notranslate"><span class="pre">/nix/var/nix/profiles/system</span></code> to keep track of the
+current and previous system configurations, use
+<code class="file docutils literal notranslate"><span class="pre">/nix/var/nix/profiles/system-profiles/</span></code>.
+When you use GRUB 2, for every system profile created with this flag,
+NixOS will create a submenu named “NixOS - Profile
+‘<em>name</em>’” in GRUB’s boot menu, containing
+the current and previous configurations of this profile.</p>
+<p>For instance, if you want to test a configuration file named
+<code class="file docutils literal notranslate"><span class="pre">test.nix</span></code> without affecting the default system
+profile, you would do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nixos-rebuild switch -p test -I nixos-config=./test.nix
+</pre></div>
+</div>
+<p>The new configuration will appear in the GRUB 2 submenu “NixOS -
+Profile ‘test’”.</p>
+</div></blockquote>
+</div>
+<div class="section" id="build-host">
+<span id="id16"></span><h2>–build-host<a class="headerlink" href="#build-host" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Instead of building the new configuration locally, use the specified host
+to perform the build. The host needs to be accessible with ssh, and must
+be able to perform Nix builds. If the option
+is not set, the build will be copied back
+to the local machine when done.</p>
+<p>Note that, if is not specified, Nix will
+be built both locally and remotely. This is because the configuration
+will always be evaluated locally even though the building might be
+performed remotely.</p>
+<p>You can include a remote user name in the host name
+(<em>user&#64;host</em>). You can also set ssh options by
+defining the NIX_SSHOPTS environment variable.</p>
+</div></blockquote>
+</div>
+<div class="section" id="target-host">
+<span id="id17"></span><h2>–target-host<a class="headerlink" href="#target-host" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Specifies the NixOS target host. By setting this to something other than
+<em>localhost</em>, the system activation will happen
+on the remote host instead of the local machine. The remote host needs to
+be accessible over ssh, and for the commands ,
+and you need root access.</p>
+<p>If is not explicitly specified,
+will implicitly be set to the same value as
+. So, if you only specify
+both building and activation will take
+place remotely (and no build artifacts will be copied to the local
+machine).</p>
+<p>You can include a remote user name in the host name
+(<em>user&#64;host</em>). You can also set ssh options by
+defining the NIX_SSHOPTS environment variable.</p>
+</div></blockquote>
+</div>
+<div class="section" id="use-remote-sudo">
+<span id="id18"></span><h2>–use-remote-sudo<a class="headerlink" href="#use-remote-sudo" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>When set, nixos-rebuild prefixes remote commands that run on
+the and
+systems with <strong class="command">sudo</strong>. Setting this option allows
+deploying as a non-root user.</div></blockquote>
+</div>
+<div class="section" id="flake">
+<span id="id19"></span><h2>–flake<a class="headerlink" href="#flake" title="Permalink to this headline">¶</a></h2>
+<p><em>flake-uri*[*name</em>]</p>
+<blockquote>
+<div>Build the NixOS system from the specified flake. It defaults to
+the directory containing the target of the symlink
+<code class="file docutils literal notranslate"><span class="pre">/etc/nixos/flake.nix</span></code>, if it exists. The
+flake must contain an output named
+<code class="docutils literal notranslate"><span class="pre">nixosConfigurations.*name*</span></code>. If
+<em>name</em> is omitted, it default to the
+current host name.</div></blockquote>
+<p>In addition, <strong class="command">nixos-rebuild</strong> accepts various Nix-related
+flags, including / ,
+, ,
+and /
+. See the Nix manual for details.</p>
+</div>
+</div>
+<div class="section" id="environment">
+<h1>Environment<a class="headerlink" href="#environment" title="Permalink to this headline">¶</a></h1>
+<p>NIXOS_CONFIG</p>
+<blockquote>
+<div>Path to the main NixOS configuration module. Defaults to
+<code class="file docutils literal notranslate"><span class="pre">/etc/nixos/configuration.nix</span></code>.</div></blockquote>
+<p>NIX_SSHOPTS</p>
+<blockquote>
+<div>Additional options to be passed to <strong class="command">ssh</strong> on the command
+line.</div></blockquote>
+</div>
+<div class="section" id="files">
+<h1>Files<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h1>
+<p><code class="file docutils literal notranslate"><span class="pre">/etc/nixos/flake.nix</span></code></p>
+<blockquote>
+<div>If this file exists, then <strong class="command">nixos-rebuild</strong> will
+use it as if the option was given. This
+file may be a symlink to a <code class="file docutils literal notranslate"><span class="pre">flake.nix</span></code> in an
+actual flake; thus <code class="file docutils literal notranslate"><span class="pre">/etc/nixos</span></code> need not be a
+flake.</div></blockquote>
+<p><code class="file docutils literal notranslate"><span class="pre">/run/current-system</span></code></p>
+<blockquote>
+<div>A symlink to the currently active system configuration in the Nix store.</div></blockquote>
+<p><code class="file docutils literal notranslate"><span class="pre">/nix/var/nix/profiles/system</span></code></p>
+<blockquote>
+<div>The Nix profile that contains the current and previous system
+configurations. Used to generate the GRUB boot menu.</div></blockquote>
+</div>
+<div class="section" id="bugs">
+<h1>Bugs<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h1>
+<p>This command should be renamed to something more descriptive.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/man-nixos-rebuild.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

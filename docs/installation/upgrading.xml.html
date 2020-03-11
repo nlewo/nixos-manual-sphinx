@@ -1,0 +1,232 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Upgrading NixOS &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration" href="../configuration/configuration.xml.html" />
+    <link rel="prev" title="Changing the Configuration" href="changing-config.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="upgrading-nixos">
+<span id="sec-upgrading"></span><h1>Upgrading NixOS<a class="headerlink" href="#upgrading-nixos" title="Permalink to this headline">¶</a></h1>
+<p>The best way to keep your NixOS installation up to date is to use one of the
+NixOS <em>channels</em>. A channel is a Nix mechanism for
+distributing Nix expressions and associated binaries. The NixOS channels are
+updated automatically from NixOS’s Git repository after certain tests have
+passed and all packages have been built. These channels are:</p>
+<ul class="simple">
+<li><em>Stable channels</em>, such as
+<code class="docutils literal notranslate"><span class="pre">nixos-19.09</span></code>.
+These only get conservative bug fixes and package upgrades. For instance,
+a channel update may cause the Linux kernel on your system to be upgraded
+from 4.19.34 to 4.19.38 (a minor bug fix), but not from
+4.19.*x* to 4.20.*x* (a
+major change that has the potential to break things). Stable channels are
+generally maintained until the next stable branch is created.</li>
+<li>The <em>unstable channel</em>,
+<code class="docutils literal notranslate"><span class="pre">nixos-unstable</span></code>.
+This corresponds to NixOS’s main development branch, and may thus see
+radical changes between channel updates. It’s not recommended for
+production systems.</li>
+<li><em>Small channels</em>, such as
+<code class="docutils literal notranslate"><span class="pre">nixos-19.09-small</span></code>
+or
+<code class="docutils literal notranslate"><span class="pre">nixos-unstable-small</span></code>.
+These are identical to the stable and unstable channels described above,
+except that they contain fewer binary packages. This means they get
+updated faster than the regular channels (for instance, when a critical
+security patch is committed to NixOS’s source tree), but may require
+more packages to be built from source than usual. They’re mostly
+intended for server environments and as such contain few GUI applications.</li>
+</ul>
+<p>To see what channels are available, go to
+` &lt;<a class="reference external" href="https://nixos.org/channels">https://nixos.org/channels</a>&gt;`_. (Note that the URIs of the
+various channels redirect to a directory that contains the channel’s latest
+version and includes ISO images and VirtualBox appliances.) Please note that
+during the release process, channels that are not yet released will be
+present here as well. See the Getting NixOS page
+` &lt;<a class="reference external" href="https://nixos.org/nixos/download.html">https://nixos.org/nixos/download.html</a>&gt;`_ to find the newest
+supported stable release.</p>
+<p>When you first install NixOS, you’re automatically subscribed to the NixOS
+channel that corresponds to your installation source. For instance, if you
+installed from a 19.09 ISO, you will be subscribed to the
+<code class="docutils literal notranslate"><span class="pre">nixos-19.09</span></code> channel. To see which NixOS channel you’re
+subscribed to, run the following as root:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nix-channel --list | grep nixos</span>
+<span class="n">nixos</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">nixos</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">channels</span><span class="o">/</span><span class="n">nixos</span><span class="o">-</span><span class="n">unstable</span>
+</pre></div>
+</div>
+<p>To switch to a different NixOS channel, do</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nix-channel --add https://nixos.org/channels/*channel-name* nixos</span>
+</pre></div>
+</div>
+<p>(Be sure to include the <code class="docutils literal notranslate"><span class="pre">nixos</span></code> parameter at the end.) For
+instance, to use the NixOS 19.09 stable channel:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nix-channel --add https://nixos.org/channels/nixos-19.09 nixos</span>
+</pre></div>
+</div>
+<p>If you have a server, you may want to use the “small” channel instead:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nix-channel --add https://nixos.org/channels/nixos-19.09-small nixos</span>
+</pre></div>
+</div>
+<p>And if you want to live on the bleeding edge:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nix-channel --add https://nixos.org/channels/nixos-unstable nixos</span>
+</pre></div>
+</div>
+<p>You can then upgrade NixOS to the latest version in your chosen channel by
+running</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nixos-rebuild switch --upgrade</span>
+</pre></div>
+</div>
+<p>which is equivalent to the more verbose <code class="docutils literal notranslate"><span class="pre">nix-channel</span> <span class="pre">--update</span> <span class="pre">nixos;</span>
+<span class="pre">nixos-rebuild</span> <span class="pre">switch</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Channels are set per user. This means that running <code class="docutils literal notranslate"><span class="pre">nix-channel</span>
+<span class="pre">--add</span></code> as a non root user (or without sudo) will not affect
+configuration in <code class="docutils literal notranslate"><span class="pre">/etc/nixos/configuration.nix</span></code></p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">It is generally safe to switch back and forth between channels. The only
+exception is that a newer NixOS may also have a newer Nix version, which may
+involve an upgrade of Nix’s database schema. This cannot be undone easily,
+so in that case you will not be able to go back to your original channel.</p>
+</div>
+<div class="section" id="automatic-upgrades">
+<span id="sec-upgrading-automatic"></span><h2>Automatic Upgrades<a class="headerlink" href="#automatic-upgrades" title="Permalink to this headline">¶</a></h2>
+<p>You can keep a NixOS system up-to-date automatically by adding the following
+to <code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code>:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-system-autoupgrade-enable"><span class="std std-ref">system.autoUpgrade.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-system-autoupgrade-allowreboot"><span class="std std-ref">system.autoUpgrade.allowReboot</span></a>  = true;
+</pre>
+<p>This enables a periodically executed systemd service named
+<code class="docutils literal notranslate"><span class="pre">nixos-upgrade.service</span></code>. If the <code class="docutils literal notranslate"><span class="pre">allowReboot</span></code>
+option is <code class="docutils literal notranslate"><span class="pre">false</span></code>, it runs <strong class="command">nixos-rebuild switch
+--upgrade</strong> to upgrade NixOS to the latest version in the current
+channel. (To see when the service runs, see <strong class="command">systemctl list-timers</strong>.)
+If <code class="docutils literal notranslate"><span class="pre">allowReboot</span></code> is <code class="docutils literal notranslate"><span class="pre">true</span></code>, then the
+system will automatically reboot if the new generation contains a different
+kernel, initrd or kernel modules.
+You can also specify a channel explicitly, e.g.</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-system-autoupgrade-channel"><span class="std std-ref">system.autoUpgrade.channel</span></a>  = <a class="reference external" href="https://nixos.org/channels/nixos-19.09">https://nixos.org/channels/nixos-19.09</a>;
+</pre>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="installation.xml.html">Installation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="obtaining.xml.html">Obtaining NixOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installing.xml.html">Installing NixOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changing-config.xml.html">Changing the Configuration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Upgrading NixOS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="installation.xml.html">Installation</a><ul>
+      <li>Previous: <a href="changing-config.xml.html" title="previous chapter">Changing the Configuration</a></li>
+      <li>Next: <a href="../configuration/configuration.xml.html" title="next chapter">Configuration</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/installation/upgrading.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

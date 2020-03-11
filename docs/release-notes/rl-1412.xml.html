@@ -1,0 +1,259 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Release 14.12 (“Caterpillar”, 2014/12/30) &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="release-14-12-caterpillar-2014-12-30">
+<span id="sec-release-14-12"></span><h1>Release 14.12 (“Caterpillar”, 2014/12/30)<a class="headerlink" href="#release-14-12-caterpillar-2014-12-30" title="Permalink to this headline">¶</a></h1>
+<p>In addition to numerous new and upgraded packages, this release has the
+following highlights:</p>
+<ul class="simple">
+<li>Systemd has been updated to version 217, which has numerous
+<a class="reference external" href="http://lists.freedesktop.org/archives/systemd-devel/2014-October/024662.html">improvements.</a></li>
+<li><a class="reference external" href="https://www.mail-archive.com/nix-dev&#64;lists.science.uu.nl/msg13957.html">Nix has been updated to 1.8.</a></li>
+<li>NixOS is now based on Glibc 2.20.</li>
+<li>KDE has been updated to 4.14.</li>
+<li>The default Linux kernel has been updated to 3.14.</li>
+<li>If is enabled (the default), changes
+made to the declaration of a user or group will be correctly realised when
+running <strong class="command">nixos-rebuild</strong>. For instance, removing a user
+specification from <code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code> will cause the
+actual user account to be deleted. If
+is disabled, it is no longer necessary to specify UIDs or GIDs; if
+omitted, they are allocated dynamically.</li>
+</ul>
+<p>Following new services were added since the last release:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">atftpd</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">bosun</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">bspwm</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">chronos</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">collectd</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">consul</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">cpuminer-cryptonight</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">crashplan</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">dnscrypt-proxy</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">docker-registry</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">docker</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">etcd</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">fail2ban</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">fcgiwrap</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">fleet</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">fluxbox</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gdm</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">geoclue2</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gitlab</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gitolite</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome3.gnome-documents</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome3.gnome-online-miners</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome3.gvfs</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome3.seahorse</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">hbase</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">i2pd</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">influxdb</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">kubernetes</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">liquidsoap</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">lxc</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">mailpile</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">mesos</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">mlmmj</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">monetdb</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">mopidy</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">neo4j</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">nsd</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">openntpd</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">opentsdb</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">openvswitch</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">parallels-guest</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">peerflix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">phd</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">polipo</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">prosody</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">radicale</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">redmine</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">riemann</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">scollector</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">seeks</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">siproxd</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">strongswan</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">tcsd</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">teamspeak3</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">thermald</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">torque/mrom</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">torque/server</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">uhub</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">unifi</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">znc</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">zookeeper</span></code></li>
+</ul>
+<p>When upgrading from a previous release, please be aware of the following
+incompatible changes:</p>
+<ul>
+<li><p class="first">The default version of Apache httpd is now 2.4. If you use the
+option to pass literal Apache configuration
+text, you may need to update it — see
+<a class="reference external" href="http://httpd.apache.org/docs/2.4/upgrading.html">Apache’s
+documentation</a> for details. If you wish to continue to use httpd
+2.2, add the following line to your NixOS configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">services</span><span class="o">.</span><span class="n">httpd</span><span class="o">.</span><span class="n">package</span> <span class="o">=</span> <span class="n">pkgs</span><span class="o">.</span><span class="n">apacheHttpd_2_2</span><span class="p">;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">PHP 5.3 has been removed because it is no longer supported by the PHP
+project. A <a class="reference external" href="http://php.net/migration54">migration
+guide</a> is available.</p>
+</li>
+<li><p class="first">The host side of a container virtual Ethernet pair is now called
+<code class="docutils literal notranslate"><span class="pre">ve-*container-name*</span></code> rather
+than <code class="docutils literal notranslate"><span class="pre">c-*container-name*</span></code>.</p>
+</li>
+<li><p class="first">GNOME 3.10 support has been dropped. The default GNOME version is now
+3.12.</p>
+</li>
+<li><p class="first">VirtualBox has been upgraded to 4.3.20 release. Users may be required to
+run <strong class="command">rm -rf /tmp/.vbox*</strong>. The line <code class="docutils literal notranslate"><span class="pre">imports</span> <span class="pre">=</span> <span class="pre">[</span>
+<span class="pre">&lt;nixpkgs/nixos/modules/programs/virtualbox.nix&gt;</span> <span class="pre">]</span></code> is no
+longer necessary, use <code class="docutils literal notranslate"><span class="pre">services.virtualboxHost.enable</span> <span class="pre">=</span>
+<span class="pre">true</span></code> instead.</p>
+<p>Also, hardening mode is now enabled by default, which means that unless
+you want to use USB support, you no longer need to be a member of the
+<code class="docutils literal notranslate"><span class="pre">vboxusers</span></code> group.</p>
+</li>
+<li><p class="first">Chromium has been updated to 39.0.2171.65.
+is now enabled by default.
+<code class="docutils literal notranslate"><span class="pre">chromium*Wrapper</span></code> packages no longer exist, because
+upstream removed NSAPI support. <code class="docutils literal notranslate"><span class="pre">chromium-stable</span></code> has
+been renamed to <code class="docutils literal notranslate"><span class="pre">chromium</span></code>.</p>
+</li>
+<li><p class="first">Python packaging documentation is now part of nixpkgs manual. To override
+the python packages available to a custom python you now use
+<code class="docutils literal notranslate"><span class="pre">pkgs.pythonFull.buildEnv.override</span></code> instead of
+<code class="docutils literal notranslate"><span class="pre">pkgs.pythonFull.override</span></code>.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">boot.resumeDevice</span> <span class="pre">=</span> <span class="pre">&quot;8:6&quot;</span></code> is no longer supported. Most
+users will want to leave it undefined, which takes the swap partitions
+automatically. There is an evaluation assertion to ensure that the string
+starts with a slash.</p>
+</li>
+<li><p class="first">The system-wide default timezone for NixOS installations changed from
+<code class="docutils literal notranslate"><span class="pre">CET</span></code> to <code class="docutils literal notranslate"><span class="pre">UTC</span></code>. To choose a different
+timezone for your system, configure <code class="docutils literal notranslate"><span class="pre">time.timeZone</span></code> in
+<code class="docutils literal notranslate"><span class="pre">configuration.nix</span></code>. A fairly complete list of possible
+values for that setting is available at
+` &lt;<a class="reference external" href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">https://en.wikipedia.org/wiki/List_of_tz_database_time_zones</a>&gt;`_.</p>
+</li>
+<li><p class="first">GNU screen has been updated to 4.2.1, which breaks the ability to connect
+to sessions created by older versions of screen.</p>
+</li>
+<li><p class="first">The Intel GPU driver was updated to the 3.x prerelease version (used by
+most distributions) and supports DRI3 now.</p>
+</li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/release-notes/rl-1412.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

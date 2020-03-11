@@ -1,0 +1,190 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Getting the Sources &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Writing NixOS Modules" href="writing-modules.xml.html" />
+    <link rel="prev" title="Development" href="development.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="getting-the-sources">
+<span id="sec-getting-sources"></span><h1>Getting the Sources<a class="headerlink" href="#getting-the-sources" title="Permalink to this headline">¶</a></h1>
+<p>By default, NixOS’s <strong class="command">nixos-rebuild</strong> command uses the NixOS
+and Nixpkgs sources provided by the <code class="docutils literal notranslate"><span class="pre">nixos</span></code> channel (kept in
+<code class="file docutils literal notranslate"><span class="pre">/nix/var/nix/profiles/per-user/root/channels/nixos</span></code>). To
+modify NixOS, however, you should check out the latest sources from Git. This
+is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/NixOS/nixpkgs$ cd nixpkgs$ git remote update origin
+</pre></div>
+</div>
+<p>This will check out the latest Nixpkgs sources to
+<code class="file docutils literal notranslate"><span class="pre">./nixpkgs</span></code> the NixOS sources to
+<code class="file docutils literal notranslate"><span class="pre">./nixpkgs/nixos</span></code>. (The NixOS source tree lives in a
+subdirectory of the Nixpkgs repository.) The
+<code class="docutils literal notranslate"><span class="pre">nixpkgs</span></code> repository has branches that correspond
+to each Nixpkgs/NixOS channel (see <a class="reference internal" href="../installation/upgrading.xml.html#sec-upgrading"><span class="std std-ref">Upgrading NixOS</span></a> for more
+information about channels). Thus, the Git branch
+<code class="docutils literal notranslate"><span class="pre">origin/nixos-17.03</span></code> will contain the latest built and
+tested version available in the <code class="docutils literal notranslate"><span class="pre">nixos-17.03</span></code> channel.</p>
+<p>It’s often inconvenient to develop directly on the master branch, since if
+somebody has just committed (say) a change to GCC, then the binary cache may
+not have caught up yet and you’ll have to rebuild everything from source.
+So you may want to create a local branch based on your current NixOS version:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nixos-version
+17.09pre104379.6e0b727 (Hummingbird)
+$ git checkout -b local 6e0b727
+</pre></div>
+</div>
+<p>Or, to base your local branch on the latest version available in a NixOS
+channel:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git remote update origin$ git checkout -b local origin/nixos-17.03
+</pre></div>
+</div>
+<p>(Replace <code class="docutils literal notranslate"><span class="pre">nixos-17.03</span></code> with the name of the channel you want
+to use.) You can use <strong class="command">git merge</strong> or <strong class="command">git
+rebase</strong> to keep your local branch in sync with the channel, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git remote update origin$ git merge origin/nixos-17.03
+</pre></div>
+</div>
+<p>You can use <strong class="command">git cherry-pick</strong> to copy commits from your
+local branch to the upstream branch.</p>
+<p>If you want to rebuild your system using your (modified) sources, you need to
+tell <strong class="command">nixos-rebuild</strong> about them using the
+flag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nixos-rebuild switch -I nixpkgs=*/my/sources*/nixpkgs</span>
+</pre></div>
+</div>
+<p>If you want <strong class="command">nix-env</strong> to use the expressions in
+<em>/my/sources</em>, use <strong class="command">nix-env -f
+*/my/sources*/nixpkgs</strong>, or change the
+default by adding a symlink in <code class="file docutils literal notranslate"><span class="pre">~/.nix-defexpr</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ln -s */my/sources*/nixpkgs ~/.nix-defexpr/nixpkgs
+</pre></div>
+</div>
+<p>You may want to delete the symlink
+<code class="file docutils literal notranslate"><span class="pre">~/.nix-defexpr/channels_root</span></code> to prevent root’s NixOS
+channel from clashing with your own tree (this may break the
+command-not-found utility though). If you want to go back to the default
+state, you may just remove the <code class="file docutils literal notranslate"><span class="pre">~/.nix-defexpr</span></code> directory
+completely, log out and log in again and it should have been recreated with a
+link to the root channels.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="development.xml.html">Development</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Getting the Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-modules.xml.html">Writing NixOS Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building-parts.xml.html">Building Specific Parts of NixOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-documentation.xml.html">Writing NixOS Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building-nixos.xml.html">Building Your Own NixOS CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nixos-tests.xml.html">NixOS Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing-installer.xml.html">Testing the Installer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.xml.html">Releases</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="development.xml.html">Development</a><ul>
+      <li>Previous: <a href="development.xml.html" title="previous chapter">Development</a></li>
+      <li>Next: <a href="writing-modules.xml.html" title="next chapter">Writing NixOS Modules</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/development/sources.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

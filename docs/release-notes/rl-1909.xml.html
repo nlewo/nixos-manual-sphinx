@@ -1,0 +1,647 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Release 19.09 (“Loris”, 2019/10/09) &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="release-19-09-loris-2019-10-09">
+<span id="sec-release-19-09"></span><h1>Release 19.09 (“Loris”, 2019/10/09)<a class="headerlink" href="#release-19-09-loris-2019-10-09" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="highlights">
+<span id="sec-release-19-09-highlights"></span><h1>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h1>
+<p>In addition to numerous new and upgraded packages, this release has the
+following highlights:</p>
+<ul>
+<li><p class="first">End of support is planned for end of April 2020, handing over to 20.03.</p>
+</li>
+<li><p class="first">Nix has been updated to 2.3; see its
+<a class="reference external" href="https://nixos.org/nix/manual/#ssec-relnotes-2.3">release
+notes</a>.</p>
+</li>
+<li><p class="first">Core version changes:</p>
+<p>systemd: 239 -&gt; 243</p>
+<p>gcc: 7 -&gt; 8</p>
+<p>glibc: 2.27 (unchanged)</p>
+<p>linux: 4.19 LTS (unchanged)</p>
+<p>openssl: 1.0 -&gt; 1.1</p>
+</li>
+<li><p class="first">Desktop version changes:</p>
+<p>plasma5: 5.14 -&gt; 5.16</p>
+<p>gnome3: 3.30 -&gt; 3.32</p>
+</li>
+<li><p class="first">PHP now defaults to PHP 7.3, updated from 7.2.</p>
+</li>
+<li><p class="first">PHP 7.1 is no longer supported due to upstream not supporting this version for the entire lifecycle of the 19.09 release.</p>
+</li>
+<li><p class="first">The binfmt module is now easier to use. Additional systems can
+be added through .
+For instance, <code class="docutils literal notranslate"><span class="pre">boot.binfmt.emulatedSystems</span> <span class="pre">=</span> <span class="pre">[</span>
+<span class="pre">&quot;wasm32-wasi&quot;</span> <span class="pre">&quot;x86_64-windows&quot;</span> <span class="pre">&quot;aarch64-linux&quot;</span> <span class="pre">];</span></code> will
+set up binfmt interpreters for each of those listed systems.</p>
+</li>
+<li><p class="first">The installer now uses a less privileged <code class="docutils literal notranslate"><span class="pre">nixos</span></code> user whereas before we logged in as root.
+To gain root privileges use <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">-i</span></code> without a password.</p>
+</li>
+<li><p class="first">We’ve updated to Xfce 4.14, which brings a new module .
+If you’d like to upgrade, please switch from the module as it
+will be deprecated in a future release. They’re incompatibilities with the current Xfce module; it doesn’t support
+and it isn’t recommended to use
+and simultaneously or to downgrade from Xfce 4.14 after upgrading.</p>
+</li>
+<li><p class="first">The GNOME 3 desktop manager module sports an interface to enable/disable core services, applications, and optional GNOME packages
+like games.</p>
+<ul class="simple">
+<li>This can be achieved with the following options which the desktop manager default enables, excluding <code class="docutils literal notranslate"><span class="pre">games</span></code>.</li>
+<li><a class="reference internal" href="../generated/options-db.xml.html#opt-services-gnome3-core-os-services-enable"><span class="std std-ref">services.gnome3.core-os-services.enable</span></a></li>
+<li><a class="reference internal" href="../generated/options-db.xml.html#opt-services-gnome3-core-shell-enable"><span class="std std-ref">services.gnome3.core-shell.enable</span></a></li>
+<li><a class="reference internal" href="../generated/options-db.xml.html#opt-services-gnome3-core-utilities-enable"><span class="std std-ref">services.gnome3.core-utilities.enable</span></a></li>
+<li><a class="reference internal" href="../generated/options-db.xml.html#opt-services-gnome3-games-enable"><span class="std std-ref">services.gnome3.games.enable</span></a></li>
+</ul>
+<p>With these options we hope to give users finer grained control over their systems. Prior to this change you’d either have to manually
+disable options or use which only excluded the optional applications.
+is now unguarded, it can exclude any package installed with
+in the GNOME 3 module.</p>
+</li>
+<li><p class="first">Orthogonal to the previous changes to the GNOME 3 desktop manager module, we’ve updated all default services and applications
+to match as close as possible to a default reference GNOME 3 experience.</p>
+<p>The following changes were enacted in</p>
+<ul class="simple">
+<li>Applications removed from defaults:</li>
+<li><code class="docutils literal notranslate"><span class="pre">accerciser</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">dconf-editor</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">evolution</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome-documents</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome-nettool</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome-power-manager</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome-todo</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome-tweaks</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome-usage</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">gucharmap</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">nautilus-sendto</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">vinagre</span></code></li>
+<li>Applications added to defaults:</li>
+<li><code class="docutils literal notranslate"><span class="pre">cheese</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">geary</span></code></li>
+</ul>
+<p>The following changes were enacted in</p>
+<ul class="simple">
+<li>Applications added to defaults:</li>
+<li><code class="docutils literal notranslate"><span class="pre">gnome-color-manager</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">orca</span></code></li>
+<li>Services enabled:</li>
+<li></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="new-services">
+<span id="sec-release-19-09-new-services"></span><h1>New Services<a class="headerlink" href="#new-services" title="Permalink to this headline">¶</a></h1>
+<p>The following new services were added since the last release:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">./programs/dwm-status.nix</span></code></li>
+<li>The new <code class="docutils literal notranslate"><span class="pre">hardware.printers</span></code> module allows to declaratively configure CUPS printers
+via the <code class="docutils literal notranslate"><span class="pre">ensurePrinters</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ensureDefaultPrinter</span></code> options.
+<code class="docutils literal notranslate"><span class="pre">ensurePrinters</span></code> will never delete existing printers,
+but will make sure that the given printers are configured as declared.</li>
+<li>There is a new <a class="reference internal" href="../generated/options-db.xml.html#opt-services-system-config-printer-enable"><span class="std std-ref">services.system-config-printer.enable</span></a> and <a class="reference internal" href="../generated/options-db.xml.html#opt-programs-system-config-printer-enable"><span class="std std-ref">programs.system-config-printer.enable</span></a> module
+for the program of the same name. If you previously had <code class="docutils literal notranslate"><span class="pre">system-config-printer</span></code> enabled through some other
+means you should migrate to using one of these modules.<ul>
+<li>If you’re a user of the following desktopManager modules no action is needed:</li>
+<li></li>
+<li></li>
+<li></li>
+<li>Note Mate uses <code class="docutils literal notranslate"><span class="pre">programs.system-config-printer</span></code> as it doesn’t
+use it as a service, but its graphical interface directly.</li>
+</ul>
+</li>
+<li><a class="reference internal" href="../generated/options-db.xml.html#opt-services-blueman-enable"><span class="std std-ref">services.blueman.enable</span></a> has been added.
+If you previously had blueman installed via please
+migrate to using the NixOS module, as this would result in an insufficiently configured blueman.</li>
+</ul>
+</div>
+<div class="section" id="backward-incompatibilities">
+<span id="sec-release-19-09-incompatibilities"></span><h1>Backward Incompatibilities<a class="headerlink" href="#backward-incompatibilities" title="Permalink to this headline">¶</a></h1>
+<p>When upgrading from a previous release, please be aware of the following
+incompatible changes:</p>
+<ul>
+<li><p class="first">Buildbot no longer supports Python 2, as support was dropped upstream in
+version 2.0.0. Configurations may need to be modified to make them
+compatible with Python 3.</p>
+</li>
+<li><p class="first">PostgreSQL now uses
+<code class="file docutils literal notranslate"><span class="pre">/run/postgresql</span></code> as its socket
+directory instead of <code class="file docutils literal notranslate"><span class="pre">/tmp</span></code>. So
+if you run an application like eg. Nextcloud, where you need to use
+the Unix socket path as the database host name, you need to change it
+accordingly.</p>
+</li>
+<li><p class="first">PostgreSQL 9.4 is scheduled EOL during the 19.09 life cycle and has been removed.</p>
+</li>
+<li><p class="first">The options and
+have been removed
+because the alertmanager service is now using systemd’s <a class="reference external" href="http://0pointer.net/blog/dynamic-users-with-systemd.html">DynamicUser mechanism</a> which obviates these options.</p>
+</li>
+<li><p class="first">The NetworkManager systemd unit was renamed back from network-manager.service to
+NetworkManager.service for better compatibility with other applications expecting this name.
+The same applies to ModemManager where modem-manager.service is now called ModemManager.service again.</p>
+</li>
+<li><p class="first">The and
+options were removed as they are managed internally by the nzbget. The
+option hadn’t actually been used by
+the module for some time and so was removed as cleanup.</p>
+</li>
+<li><p class="first">The option was removed, as it was only used by the wordpress
+apache-httpd service to wait for mysql to have started up.
+This can be accomplished by either describing a dependency on mysql.service (preferred)
+or waiting for the (hardcoded) <code class="file docutils literal notranslate"><span class="pre">/run/mysqld/mysql.sock</span></code> file to appear.</p>
+</li>
+<li><p class="first">The module has been removed, see
+instead for a free software fork of Emby.</p>
+<p>See the Jellyfin documentation:
+<a class="reference external" href="https://jellyfin.readthedocs.io/en/latest/administrator-docs/migrate-from-emby/">Migrating from Emby to Jellyfin</a></p>
+</li>
+<li><p class="first">IPv6 Privacy Extensions are now enabled by default for undeclared
+interfaces. The previous behaviour was quite misleading — even though
+the default value for
+was
+<code class="docutils literal notranslate"><span class="pre">true</span></code>, undeclared interfaces would not prefer temporary
+addresses. Now, interfaces not mentioned in the config will prefer
+temporary addresses. EUI64 addresses can still be set as preferred by
+explicitly setting the option to <code class="docutils literal notranslate"><span class="pre">false</span></code> for the
+interface in question.</p>
+</li>
+<li><p class="first">Since Bittorrent Sync was superseded by Resilio Sync in 2016, the
+<code class="docutils literal notranslate"><span class="pre">bittorrentSync</span></code>, <code class="docutils literal notranslate"><span class="pre">bittorrentSync14</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">bittorrentSync16</span></code> packages have been removed in
+favor of <code class="docutils literal notranslate"><span class="pre">resilio-sync</span></code>.</p>
+<p>The corresponding module, has been
+replaced by the module.</p>
+</li>
+<li><p class="first">The httpd service no longer attempts to start the postgresql service. If you have come to depend
+on this behaviour then you can preserve the behavior with the following configuration:
+<code class="docutils literal notranslate"><span class="pre">systemd.services.httpd.after</span> <span class="pre">=</span> <span class="pre">[</span> <span class="pre">&quot;postgresql.service&quot;</span> <span class="pre">];</span></code></p>
+<p>The option has been
+marked as deprecated. You may still use this feature, but it will be
+removed in a future release of NixOS. You are encouraged to convert any
+httpd subservices you may have written to a full NixOS module.</p>
+<p>Most of the httpd subservices packaged with NixOS have been replaced with
+full NixOS modules including LimeSurvey, WordPress, and Zabbix. These
+modules can be enabled using the ,
+, ,
+and options.</p>
+</li>
+<li><p class="first">The option
+was renamed to
+(capital <code class="docutils literal notranslate"><span class="pre">L</span></code>). This follows
+<a class="reference external" href="https://github.com/systemd/systemd/commit/9cb8c5593443d24c19e40bfd4fc06d672f8c554c">upstreams renaming</a> of the setting.</p>
+</li>
+<li><p class="first">As of this release the NixOps feature <code class="docutils literal notranslate"><span class="pre">autoLuks</span></code> is deprecated. It no longer works
+with our systemd version without manual intervention.</p>
+<p>Whenever the usage of the module is detected the evaluation will fail with a message
+explaining why and how to deal with the situation.</p>
+<p>A new knob named <code class="docutils literal notranslate"><span class="pre">nixops.enableDeprecatedAutoLuks</span></code>
+has been introduced to disable the eval failure and to acknowledge the notice was received and read.
+If you plan on using the feature please note that it might break with subsequent updates.</p>
+<p>Make sure you set the <code class="docutils literal notranslate"><span class="pre">_netdev</span></code> option for each of the file systems referring to block
+devices provided by the autoLuks module. Not doing this might render the system in a
+state where it doesn’t boot anymore.</p>
+<p>If you are actively using the <code class="docutils literal notranslate"><span class="pre">autoLuks</span></code> module please let us know in
+<a class="reference external" href="https://github.com/NixOS/nixpkgs/issues/62211">issue #62211</a>.</p>
+</li>
+<li><p class="first">The setopt declarations will be evaluated at the end of <code class="docutils literal notranslate"><span class="pre">/etc/zshrc</span></code>, so any code in <a class="reference internal" href="../generated/options-db.xml.html#opt-programs-zsh-interactiveshellinit"><span class="std std-ref">programs.zsh.interactiveShellInit</span></a>,
+<a class="reference internal" href="../generated/options-db.xml.html#opt-programs-zsh-loginshellinit"><span class="std std-ref">programs.zsh.loginShellInit</span></a> and <a class="reference internal" href="../generated/options-db.xml.html#opt-programs-zsh-promptinit"><span class="std std-ref">programs.zsh.promptInit</span></a> may break if it relies on those options being set.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">prometheus-nginx-exporter</span></code> package now uses the offical exporter provided by NGINX Inc.
+Its metrics are differently structured and are incompatible to the old ones. For information about the metrics,
+have a look at the <a class="reference external" href="https://github.com/nginxinc/nginx-prometheus-exporter">official repo</a>.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">shibboleth-sp</span></code> package has been updated to version 3.
+It is largely backward compatible, for further information refer to the
+<a class="reference external" href="https://wiki.shibboleth.net/confluence/display/SP3/ReleaseNotes">release notes</a>
+and <a class="reference external" href="https://wiki.shibboleth.net/confluence/display/SP3/UpgradingFromV2">upgrade guide</a>.</p>
+<p>Nodejs 8 is scheduled EOL under the lifetime of 19.09 and has been dropped.</p>
+</li>
+<li><p class="first">By default, prometheus exporters are now run with <code class="docutils literal notranslate"><span class="pre">DynamicUser</span></code> enabled.
+Exporters that need a real user, now run under a seperate user and group which follow the pattern <code class="docutils literal notranslate"><span class="pre">&lt;exporter-name&gt;-exporter</span></code>, instead of the previous default <code class="docutils literal notranslate"><span class="pre">nobody</span></code> and <code class="docutils literal notranslate"><span class="pre">nogroup</span></code>.
+Only some exporters are affected by the latter, namely the exporters <code class="docutils literal notranslate"><span class="pre">dovecot</span></code>, <code class="docutils literal notranslate"><span class="pre">node</span></code>, <code class="docutils literal notranslate"><span class="pre">postfix</span></code> and <code class="docutils literal notranslate"><span class="pre">varnish</span></code>.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">ibus-qt</span></code> package is not installed by default anymore when <a class="reference internal" href="../generated/options-db.xml.html#opt-i18n-inputmethod-enabled"><span class="std std-ref">i18n.inputMethod.enabled</span></a> is set to <code class="docutils literal notranslate"><span class="pre">ibus</span></code>.
+If IBus support in Qt 4.x applications is required, add the <code class="docutils literal notranslate"><span class="pre">ibus-qt</span></code> package to your <a class="reference internal" href="../generated/options-db.xml.html#opt-environment-systempackages"><span class="std std-ref">environment.systemPackages</span></a> manually.</p>
+</li>
+<li><p class="first">The CUPS Printing service now uses socket-based activation by
+default, only starting when needed. The previous behavior can
+be restored by setting
+to
+<code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</li>
+<li><p class="first">The module has been removed from nixpkgs due to lack of maintainer.</p>
+</li>
+<li><p class="first">The module has been removed from nixpkgs due to lack of maintainer.</p>
+</li>
+<li><p class="first">Squid 3 has been removed and the derivation now refers to Squid 4.</p>
+</li>
+<li><p class="first">The option has been replaced by
+. The new option allows setting extra
+configuration while being better type-checked and mergeable.</p>
+</li>
+<li><p class="first">No service depends on <code class="docutils literal notranslate"><span class="pre">keys.target</span></code> anymore which is a systemd
+target that indicates if all <a class="reference external" href="https://nixos.org/nixops/manual/#idm140737322342384">NixOps keys</a> were successfully uploaded.
+Instead, <code class="docutils literal notranslate"><span class="pre">&lt;key-name&gt;-key.service</span></code> should be used to define
+a dependency of a key in a service. The full issue behind the <code class="docutils literal notranslate"><span class="pre">keys.target</span></code>
+dependency is described at <a class="reference external" href="https://github.com/NixOS/nixpkgs/issues/67265">NixOS/nixpkgs#67265</a>.</p>
+<p>The following services are affected by this:</p>
+<ul class="simple">
+<li><a class="reference external" href="None">services.dovecot2</a></li>
+<li><a class="reference external" href="None">services.nsd</a></li>
+<li><a class="reference external" href="None">services.softether</a></li>
+<li><a class="reference external" href="None">services.strongswan</a></li>
+<li><a class="reference external" href="None">services.strongswan-swanctl</a></li>
+<li><a class="reference external" href="None">services.httpd</a></li>
+</ul>
+</li>
+<li><p class="first">The option has been replaced by a read-only option for each certificate you define. This will be
+a subdirectory of <code class="docutils literal notranslate"><span class="pre">/var/lib/acme</span></code>. You can use this read-only option to figure out where the certificates are stored for a specific certificate. For example,
+the option will use this directory option to find the certs for the virtual host.</p>
+<p>and options have been removed. To execute a service before certificates
+are provisioned or renewed add a <code class="docutils literal notranslate"><span class="pre">RequiredBy=acme-${cert}.service</span></code> to any service.</p>
+<p>Furthermore, the acme module will not automatically add a dependency on <code class="docutils literal notranslate"><span class="pre">lighttpd.service</span></code> anymore. If you are using certficates provided by letsencrypt
+for lighttpd, then you should depend on the certificate service <code class="docutils literal notranslate"><span class="pre">acme-${cert}.service&gt;</span></code> manually.</p>
+<p>For nginx, the dependencies are still automatically managed when is enabled just like before. What changed is that nginx now directly depends on the specific certificates that it needs,
+instead of depending on the catch-all <code class="docutils literal notranslate"><span class="pre">acme-certificates.target</span></code>. This target unit was also removed from the codebase.
+This will mean nginx will no longer depend on certificates it isn’t explicitly managing and fixes a bug with certificate renewal
+ordering racing with nginx restarting which could lead to nginx getting in a broken state as described at
+<a class="reference external" href="https://github.com/NixOS/nixpkgs/issues/60180">NixOS/nixpkgs#60180</a>.</p>
+</li>
+<li><p class="first">The old deprecated <code class="docutils literal notranslate"><span class="pre">emacs</span></code> package sets have been dropped.
+What used to be called <code class="docutils literal notranslate"><span class="pre">emacsPackagesNg</span></code> is now simply called <code class="docutils literal notranslate"><span class="pre">emacsPackages</span></code>.</p>
+</li>
+<li><p class="first">is now disabled by default if <code class="docutils literal notranslate"><span class="pre">stateVersion</span></code> is 19.09 or higher.
+Previously the xterm desktopManager was enabled when xserver was enabled, but it isn’t useful for all people so it didn’t make sense to
+have any desktopManager enabled default.</p>
+</li>
+<li><p class="first">The WeeChat plugin <code class="docutils literal notranslate"><span class="pre">pkgs.weechatScripts.weechat-xmpp</span></code> has been removed as it doesn’t receive
+any updates from upstream and depends on outdated Python2-based modules.</p>
+</li>
+<li><p class="first">Old unsupported versions (<code class="docutils literal notranslate"><span class="pre">logstash5</span></code>,
+<code class="docutils literal notranslate"><span class="pre">kibana5</span></code>,
+<code class="docutils literal notranslate"><span class="pre">filebeat5</span></code>,
+<code class="docutils literal notranslate"><span class="pre">heartbeat5</span></code>,
+<code class="docutils literal notranslate"><span class="pre">metricbeat5</span></code>,
+<code class="docutils literal notranslate"><span class="pre">packetbeat5</span></code>) of the ELK-stack and Elastic beats have been removed.</p>
+</li>
+<li><p class="first">For NixOS 19.03, both Prometheus 1 and 2 were available to allow for
+a seamless transition from version 1 to 2 with existing setups.
+Because Prometheus 1 is no longer developed, it was removed.
+Prometheus 2 is now configured with <code class="docutils literal notranslate"><span class="pre">services.prometheus</span></code>.</p>
+</li>
+<li><p class="first">Citrix Receiver (<code class="docutils literal notranslate"><span class="pre">citrix_receiver</span></code>) has been dropped in favor of Citrix Workspace
+(<code class="docutils literal notranslate"><span class="pre">citrix_workspace</span></code>).</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">services.gitlab</span></code> module has had its literal secret options (,
+,
+,
+,
+,
+and
+) replaced by file-based versions (,
+,
+,
+,
+,
+and
+). This was done so that secrets aren’t stored
+in the world-readable nix store, but means that for each option you’ll have to create a file with
+the same exact string, add “File” to the end of the option name, and change the definition to a
+string pointing to the corresponding file; e.g. <code class="docutils literal notranslate"><span class="pre">services.gitlab.databasePassword</span> <span class="pre">=</span> <span class="pre">&quot;supersecurepassword&quot;</span></code>
+becomes <code class="docutils literal notranslate"><span class="pre">services.gitlab.databasePasswordFile</span> <span class="pre">=</span> <span class="pre">&quot;/path/to/secret_file&quot;</span></code> where the
+file <code class="docutils literal notranslate"><span class="pre">secret_file</span></code> contains the string <code class="docutils literal notranslate"><span class="pre">supersecurepassword</span></code>.</p>
+<p>The state path () now has the following restriction:
+no parent directory can be owned by any other user than <code class="docutils literal notranslate"><span class="pre">root</span></code> or the user
+specified in ; i.e. if
+is set to <code class="docutils literal notranslate"><span class="pre">/var/lib/gitlab/state</span></code>, <code class="docutils literal notranslate"><span class="pre">gitlab</span></code> and all parent directories
+must be owned by either <code class="docutils literal notranslate"><span class="pre">root</span></code> or the user specified in .</p>
+</li>
+<li><p class="first">The option is unsupported in combination with
+in anticipation of defaulting to it.
+It has to be set to <code class="docutils literal notranslate"><span class="pre">false</span></code> and enabled per
+interface with</p>
+</li>
+<li><p class="first">The Twitter client <code class="docutils literal notranslate"><span class="pre">corebird</span></code> has been dropped as <a class="reference external" href="https://www.patreon.com/posts/corebirds-future-18921328">it is discontinued and does not work against the new Twitter API</a>.
+Please use the fork <code class="docutils literal notranslate"><span class="pre">cawbird</span></code> instead which has been adapted to the API changes and is still maintained.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">nodejs-11_x</span></code> package has been removed as it’s EOLed by upstream.</p>
+</li>
+<li><p class="first">Because of the systemd upgrade,
+<strong class="program">systemd-timesyncd</strong> will no longer work if
+is not set correctly. When
+upgrading from NixOS 19.03, please make sure that
+is set to
+<code class="docutils literal notranslate"><span class="pre">&quot;19.03&quot;</span></code>, or lower if the installation dates back to an
+earlier version of NixOS.</p>
+</li>
+<li><p class="first">Due to the short lifetime of non-LTS kernel releases package attributes like <code class="docutils literal notranslate"><span class="pre">linux_5_1</span></code>,
+<code class="docutils literal notranslate"><span class="pre">linux_5_2</span></code> and <code class="docutils literal notranslate"><span class="pre">linux_5_3</span></code> have been removed to discourage dependence
+on specific non-LTS kernel versions in stable NixOS releases.</p>
+<p>Going forward, versioned attributes like <code class="docutils literal notranslate"><span class="pre">linux_4_9</span></code> will exist for LTS versions only.
+Please use <code class="docutils literal notranslate"><span class="pre">linux_latest</span></code> or <code class="docutils literal notranslate"><span class="pre">linux_testing</span></code> if you depend on non-LTS
+releases. Keep in mind that <code class="docutils literal notranslate"><span class="pre">linux_latest</span></code> and <code class="docutils literal notranslate"><span class="pre">linux_testing</span></code> will
+change versions under the hood during the lifetime of a stable release and might include breaking changes.</p>
+</li>
+<li><p class="first">Because of the systemd upgrade,
+some network interfaces might change their name. For details see
+<a class="reference external" href="https://www.freedesktop.org/software/systemd/man/systemd.net-naming-scheme.html#History">upstream docs</a> or <a class="reference external" href="https://github.com/NixOS/nixpkgs/issues/71086">our ticket</a>.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="other-notable-changes">
+<span id="sec-release-19-09-notable-changes"></span><h1>Other Notable Changes<a class="headerlink" href="#other-notable-changes" title="Permalink to this headline">¶</a></h1>
+<ul>
+<li><p class="first">The module gained an option named
+which makes the
+generated
+configuration.nix
+5 manual page include all options
+from all NixOS modules included in a given
+<code class="docutils literal notranslate"><span class="pre">configuration.nix</span></code> configuration file. Currently, it is
+set to <code class="docutils literal notranslate"><span class="pre">false</span></code> by default as enabling it frequently
+prevents evaluation. But the plan is to eventually have it set to
+<code class="docutils literal notranslate"><span class="pre">true</span></code> by default. Please set it to
+<code class="docutils literal notranslate"><span class="pre">true</span></code> now in your <code class="docutils literal notranslate"><span class="pre">configuration.nix</span></code>
+and fix all the bugs it uncovers.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">vlc</span></code> package gained support for Chromecast
+streaming, enabled by default. TCP port 8010 must be open for it to work,
+so something like <code class="docutils literal notranslate"><span class="pre">networking.firewall.allowedTCPPorts</span> <span class="pre">=</span> <span class="pre">[</span> <span class="pre">8010</span>
+<span class="pre">];</span></code> may be required in your configuration. Also consider enabling
+<a class="reference external" href="https://nixos.wiki/wiki/Accelerated_Video_Playback">Accelerated Video Playback</a> for better transcoding performance.</p>
+</li>
+<li><p class="first">The following changes apply if the <code class="docutils literal notranslate"><span class="pre">stateVersion</span></code> is
+changed to 19.09 or higher. For <code class="docutils literal notranslate"><span class="pre">stateVersion</span> <span class="pre">=</span> <span class="pre">&quot;19.03&quot;</span></code>
+or lower the old behavior is preserved.</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">solr.package</span></code> defaults to
+<code class="docutils literal notranslate"><span class="pre">pkgs.solr_8</span></code>.</li>
+</ul>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">hunspellDicts.fr-any</span></code> dictionary now ships with <code class="docutils literal notranslate"><span class="pre">fr_FR.{aff,dic}</span></code>
+which is linked to <code class="docutils literal notranslate"><span class="pre">fr-toutesvariantes.{aff,dic}</span></code>.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">mysql</span></code> service now runs as <code class="docutils literal notranslate"><span class="pre">mysql</span></code>
+user. Previously, systemd did execute it as root, and mysql dropped privileges
+itself.
+This includes <code class="docutils literal notranslate"><span class="pre">ExecStartPre=</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ExecStartPost=</span></code> phases.
+To accomplish that, runtime and data directory setup was delegated to
+RuntimeDirectory and tmpfiles.</p>
+</li>
+<li><p class="first">With the upgrade to systemd version 242 the <code class="docutils literal notranslate"><span class="pre">systemd-timesyncd</span></code>
+service is no longer using <code class="docutils literal notranslate"><span class="pre">DynamicUser=yes</span></code>. In order for the
+upgrade to work we rely on an activation script to move the state from the old
+to the new directory. The older directory (prior <code class="docutils literal notranslate"><span class="pre">19.09</span></code>) was
+<code class="docutils literal notranslate"><span class="pre">/var/lib/private/systemd/timesync</span></code>.</p>
+<p>As long as the <code class="docutils literal notranslate"><span class="pre">system.config.stateVersion</span></code> is below
+<code class="docutils literal notranslate"><span class="pre">19.09</span></code> the state folder will migrated to its proper location
+(<code class="docutils literal notranslate"><span class="pre">/var/lib/systemd/timesync</span></code>), if required.</p>
+</li>
+<li><p class="first">The package <code class="docutils literal notranslate"><span class="pre">avahi</span></code> is now built to look up service
+definitions from <code class="docutils literal notranslate"><span class="pre">/etc/avahi/services</span></code> instead of its
+output directory in the nix store. Accordingly the module
+now supports custom service definitions via
+, which are then placed
+in the aforementioned directory. See
+avahi.service5
+for more information on custom service definitions.</p>
+</li>
+<li><p class="first">Since version 0.1.19, <code class="docutils literal notranslate"><span class="pre">cargo-vendor</span></code> honors package
+includes that are specified in the <code class="file docutils literal notranslate"><span class="pre">Cargo.toml</span></code>
+file of Rust crates. <code class="docutils literal notranslate"><span class="pre">rustPlatform.buildRustPackage</span></code> uses
+<code class="docutils literal notranslate"><span class="pre">cargo-vendor</span></code> to collect and build dependent crates.
+Since this change in <code class="docutils literal notranslate"><span class="pre">cargo-vendor</span></code> changes the set of
+vendored files for most Rust packages, the hash that use used to verify
+the dependencies, <code class="docutils literal notranslate"><span class="pre">cargoSha256</span></code>, also changes.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">cargoSha256</span></code> hashes of all in-tree derivations that
+use <code class="docutils literal notranslate"><span class="pre">buildRustPackage</span></code> have been updated to reflect this
+change. However, third-party derivations that use
+<code class="docutils literal notranslate"><span class="pre">buildRustPackage</span></code> may have to be updated as well.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">consul</span></code> package was upgraded past version <code class="docutils literal notranslate"><span class="pre">1.5</span></code>,
+so its deprecated legacy UI is no longer available.</p>
+</li>
+<li><p class="first">The default resample-method for PulseAudio has been changed from the upstream default <code class="docutils literal notranslate"><span class="pre">speex-float-1</span></code>
+to <code class="docutils literal notranslate"><span class="pre">speex-float-5</span></code>. Be aware that low-powered ARM-based and MIPS-based boards will struggle with this
+so you’ll need to set back to <code class="docutils literal notranslate"><span class="pre">speex-float-1</span></code>.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">phabricator</span></code> package and associated <code class="docutils literal notranslate"><span class="pre">httpd.extraSubservice</span></code>, as well as the
+<code class="docutils literal notranslate"><span class="pre">phd</span></code> service have been removed from nixpkgs due to lack of maintainer.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">mercurial</span></code> <code class="docutils literal notranslate"><span class="pre">httpd.extraSubservice</span></code> has been removed from nixpkgs due to lack of maintainer.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">trac</span></code> <code class="docutils literal notranslate"><span class="pre">httpd.extraSubservice</span></code> has been removed from nixpkgs because it was unmaintained.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">foswiki</span></code> package and associated <code class="docutils literal notranslate"><span class="pre">httpd.extraSubservice</span></code> have been removed
+from nixpkgs due to lack of maintainer.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">tomcat-connector</span></code> <code class="docutils literal notranslate"><span class="pre">httpd.extraSubservice</span></code> has been removed from nixpkgs.</p>
+</li>
+<li><p class="first">It’s now possible to change configuration in
+<a class="reference external" href="None">services.nextcloud</a> after the initial deploy
+since all config parameters are persisted in an additional config file generated by the module.
+Previously core configuration like database parameters were set using their imperative
+installer after creating <code class="docutils literal notranslate"><span class="pre">/var/lib/nextcloud</span></code>.</p>
+</li>
+<li><p class="first">There exists now <code class="docutils literal notranslate"><span class="pre">lib.forEach</span></code>, which is like <code class="docutils literal notranslate"><span class="pre">map</span></code>, but with
+arguments flipped. When mapping function body spans many lines (or has nested
+<a href="#id2"><span class="problematic" id="id3">``</span></a>map``s), it is often hard to follow which list is modified.</p>
+<p>Previous solution to this problem was either to use <code class="docutils literal notranslate"><span class="pre">lib.flip</span> <span class="pre">map</span></code>
+idiom or extract that anonymous mapping function to a named one. Both can still be used
+but <code class="docutils literal notranslate"><span class="pre">lib.forEach</span></code> is preferred over <code class="docutils literal notranslate"><span class="pre">lib.flip</span> <span class="pre">map</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d/nixos.conf</span></code> file containing all the options set via
+<a class="reference external" href="None">boot.kernel.sysctl</a> was moved to
+<code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d/60-nixos.conf</span></code>, as
+sysctl.d5
+recommends prefixing all filenames in <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d</span></code> with a
+two-digit number and a dash to simplify the ordering of the files.</p>
+</li>
+<li><p class="first">We now install the sysctl snippets shipped with systemd.</p>
+<ul class="simple">
+<li>This enables:</li>
+<li>Loose reverse path filtering</li>
+<li>Source route filtering</li>
+<li><code class="docutils literal notranslate"><span class="pre">fq_codel</span></code> as a packet scheduler (this helps to fight bufferbloat)</li>
+</ul>
+<p>This also configures the kernel to pass core dumps to <code class="docutils literal notranslate"><span class="pre">systemd-coredump</span></code>,
+and restricts the SysRq key combinations to the sync command only.
+These sysctl snippets can be found in <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d/50-\*.conf</span></code>,
+and overridden via <a class="reference external" href="None">boot.kernel.sysctl</a>
+(which will place the parameters in <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d/60-nixos.conf</span></code>).</p>
+</li>
+<li><p class="first">Core dumps are now processed by <code class="docutils literal notranslate"><span class="pre">systemd-coredump</span></code>
+by default. <code class="docutils literal notranslate"><span class="pre">systemd-coredump</span></code> behaviour can
+still be modified via
+. To stick to the
+old behaviour (having the kernel dump to a file called
+<code class="docutils literal notranslate"><span class="pre">core</span></code> in the working directory), without piping
+it through <code class="docutils literal notranslate"><span class="pre">systemd-coredump</span></code>, set
+to
+<code class="docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">systemd.packages</span></code> option now also supports generators and
+shutdown scripts. Old <code class="docutils literal notranslate"><span class="pre">systemd.generator-packages</span></code> option has
+been removed.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">rmilter</span></code> package was removed with associated module and options due deprecation by upstream developer.
+Use <code class="docutils literal notranslate"><span class="pre">rspamd</span></code> in proxy mode instead.</p>
+</li>
+<li><p class="first">systemd cgroup accounting via the
+<a class="reference external" href="None">systemd.enableCgroupAccounting</a>
+option is now enabled by default. It now also enables the more recent Block IO and IP accounting
+features.</p>
+</li>
+<li><p class="first">We no longer enable custom font rendering settings with by default.
+The defaults from fontconfig are sufficient.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">crashplan</span></code> package and the
+<code class="docutils literal notranslate"><span class="pre">crashplan</span></code> service have been removed from nixpkgs due to
+crashplan shutting down the service, while the <code class="docutils literal notranslate"><span class="pre">crashplansb</span></code>
+package and <code class="docutils literal notranslate"><span class="pre">crashplan-small-business</span></code> service have been
+removed from nixpkgs due to lack of maintainer.</p>
+<p>The <a class="reference external" href="None">redis module</a> was hardcoded to use the <code class="docutils literal notranslate"><span class="pre">redis</span></code> user,
+<code class="file docutils literal notranslate"><span class="pre">/run/redis</span></code> as runtime directory and
+<code class="file docutils literal notranslate"><span class="pre">/var/lib/redis</span></code> as state directory.
+Note that the NixOS module for Redis now disables kernel support for Transparent Huge Pages (THP),
+because this features causes major performance problems for Redis,
+e.g. (<a class="reference external" href="https://redis.io/topics/latency">https://redis.io/topics/latency</a>).</p>
+</li>
+<li><p class="first">Using adds a default emoji font <code class="docutils literal notranslate"><span class="pre">noto-fonts-emoji</span></code>.</p>
+<ul class="simple">
+<li>Users of the following options will have this enabled by default:</li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">altcoins</span></code> categorization of packages has
+been removed. You now access these packages at the top level,
+ie. <code class="docutils literal notranslate"><span class="pre">nix-shell</span> <span class="pre">-p</span> <span class="pre">dogecoin</span></code> instead of
+<code class="docutils literal notranslate"><span class="pre">nix-shell</span> <span class="pre">-p</span> <span class="pre">altcoins.dogecoin</span></code>, etc.</p>
+</li>
+<li><p class="first">Ceph has been upgraded to v14.2.1.
+See the <a class="reference external" href="https://ceph.com/releases/v14-2-0-nautilus-released/">release notes</a> for details.
+The mgr dashboard as well as osds backed by loop-devices is no longer explicitly supported by the package and module.
+Note: There’s been some issues with python-cherrypy, which is used by the dashboard
+and prometheus mgr modules (and possibly others), hence 0000-dont-check-cherrypy-version.patch.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">pkgs.weechat</span></code> is now compiled against <code class="docutils literal notranslate"><span class="pre">pkgs.python3</span></code>.
+Weechat also recommends <a class="reference external" href="https://weechat.org/scripts/python3/">to use Python3
+in their docs.</a></p>
+</li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/release-notes/rl-1909.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

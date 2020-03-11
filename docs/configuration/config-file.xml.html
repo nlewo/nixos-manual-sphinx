@@ -1,0 +1,291 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>NixOS Configuration File &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Abstractions" href="abstractions.xml.html" />
+    <link rel="prev" title="Configuration Syntax" href="config-syntax.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="nixos-configuration-file">
+<span id="sec-configuration-file"></span><h1>NixOS Configuration File<a class="headerlink" href="#nixos-configuration-file" title="Permalink to this headline">¶</a></h1>
+<p>The NixOS configuration file generally looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="n">config</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">,</span> <span class="o">...</span> <span class="p">}:</span>
+
+<span class="p">{</span> <span class="o">*</span><span class="n">option</span> <span class="n">definitions</span><span class="o">*</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The first line (<code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">config,</span> <span class="pre">pkgs,</span> <span class="pre">...</span> <span class="pre">}:</span></code>) denotes that this
+is actually a function that takes at least the two arguments
+<code class="docutils literal notranslate"><span class="pre">config</span></code> and <code class="docutils literal notranslate"><span class="pre">pkgs</span></code>. (These are explained
+later.) The function returns a <em>set</em> of option definitions
+(<code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">*...*</span> <span class="pre">}</span></code>). These definitions
+have the form <code class="docutils literal notranslate"><span class="pre">*name*</span> <span class="pre">=</span>
+<span class="pre">*value*</span></code>, where
+<em>name</em> is the name of an option and
+<em>value</em> is its value. For example,</p>
+<pre class="literal-block">
+{ config, pkgs, ... }:
+
+{ <a class="reference internal" href="../generated/options-db.xml.html#opt-services-httpd-enable"><span class="std std-ref">services.httpd.enable</span></a>  = true;
+  <a class="reference internal" href="../generated/options-db.xml.html#opt-services-httpd-adminaddr"><span class="std std-ref">services.httpd.adminAddr</span></a>  = &quot;<a class="reference external" href="mailto:alice&#37;&#52;&#48;example&#46;org">alice<span>&#64;</span>example<span>&#46;</span>org</a>&quot;;
+  <a class="reference external" href="None">services.httpd.virtualHosts.localhost.documentRoot</a>  = &quot;/webroot&quot;;
+}
+</pre>
+<p>defines a configuration with three option definitions that together enable
+the Apache HTTP Server with <code class="file docutils literal notranslate"><span class="pre">/webroot</span></code> as the document
+root.</p>
+<p>Sets can be nested, and in fact dots in option names are shorthand for
+defining a set containing another set. For instance,
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-httpd-enable"><span class="std std-ref">services.httpd.enable</span></a> defines a set named
+<code class="docutils literal notranslate"><span class="pre">services</span></code> that contains a set named
+<code class="docutils literal notranslate"><span class="pre">httpd</span></code>, which in turn contains an option definition named
+<code class="docutils literal notranslate"><span class="pre">enable</span></code> with value <code class="docutils literal notranslate"><span class="pre">true</span></code>. This means that
+the example above can also be written as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="n">config</span><span class="p">,</span> <span class="n">pkgs</span><span class="p">,</span> <span class="o">...</span> <span class="p">}:</span>
+
+<span class="p">{</span> <span class="n">services</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">httpd</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="n">enable</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+      <span class="n">adminAddr</span> <span class="o">=</span> <span class="s2">&quot;alice@example.org&quot;</span><span class="p">;</span>
+      <span class="n">virtualHosts</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">localhost</span> <span class="o">=</span> <span class="p">{</span>
+          <span class="n">documentRoot</span> <span class="o">=</span> <span class="s2">&quot;/webroot&quot;</span><span class="p">;</span>
+        <span class="p">};</span>
+      <span class="p">};</span>
+    <span class="p">};</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>which may be more convenient if you have lots of option definitions that
+share the same prefix (such as <code class="docutils literal notranslate"><span class="pre">services.httpd</span></code>).</p>
+<p>NixOS checks your option definitions for correctness. For instance, if you
+try to define an option that doesn’t exist (that is, doesn’t have a
+corresponding <em>option declaration</em>),
+<strong class="command">nixos-rebuild</strong> will give an error like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>The option \`services.httpd.enable&#39; defined in \`/etc/nixos/configuration.nix&#39; does not exist.
+</pre></div>
+</div>
+<p>Likewise, values in option definitions must have a correct type. For
+instance, must be a Boolean
+(<code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>). Trying to give it a
+value of another type, such as a string, will cause an error:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>The option value \`services.httpd.enable&#39; in \`/etc/nixos/configuration.nix&#39; is not a boolean.
+</pre></div>
+</div>
+<p>Options have various types of values. The most important are:</p>
+<p>Strings</p>
+<blockquote>
+<div><p>Strings are enclosed in double quotes, e.g.</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-networking-hostname"><span class="std std-ref">networking.hostName</span></a>  = &quot;dexter&quot;;
+</pre>
+<p>Special characters can be escaped by prefixing them with a backslash
+(e.g. <code class="docutils literal notranslate"><span class="pre">\\&quot;</span></code>).</p>
+<p>Multi-line strings can be enclosed in <em>double single
+quotes</em>, e.g.</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-networking-extrahosts"><span class="std std-ref">networking.extraHosts</span></a>  =
+  ''
+    127.0.0.2 other-localhost
+    10.0.0.1 server
+  '';
+</pre>
+<p>The main difference is that it strips from each line a number of spaces
+equal to the minimal indentation of the string as a whole (disregarding
+the indentation of empty lines), and that characters like
+<code class="docutils literal notranslate"><span class="pre">&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">\\</span></code> are not special (making it
+more convenient for including things like shell code). See more info
+about this in the Nix manual
+<a class="reference external" href="https://nixos.org/nix/manual/#ssec-values">here</a>.</p>
+</div></blockquote>
+<p>Booleans</p>
+<blockquote>
+<div><p>These can be <code class="docutils literal notranslate"><span class="pre">true</span></code> or <code class="docutils literal notranslate"><span class="pre">false</span></code>, e.g.</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-networking-firewall-enable"><span class="std std-ref">networking.firewall.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-networking-firewall-allowping"><span class="std std-ref">networking.firewall.allowPing</span></a>  = false;
+</pre>
+</div></blockquote>
+<p>Integers</p>
+<blockquote>
+<div><p>For example,</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-boot-kernel-sysctl"><span class="std std-ref">boot.kernel.sysctl</span></a>.&quot;net.ipv4.tcp_keepalive_time&quot; = 60;
+</pre>
+<p>(Note that here the attribute name
+<code class="docutils literal notranslate"><span class="pre">net.ipv4.tcp_keepalive_time</span></code> is enclosed in quotes to
+prevent it from being interpreted as a set named <code class="docutils literal notranslate"><span class="pre">net</span></code>
+containing a set named <code class="docutils literal notranslate"><span class="pre">ipv4</span></code>, and so on. This is
+because it’s not a NixOS option but the literal name of a Linux kernel
+setting.)</p>
+</div></blockquote>
+<p>Sets</p>
+<blockquote>
+<div><p>Sets were introduced above. They are name/value pairs enclosed in braces,
+as in the option definition</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-filesystems"><span class="std std-ref">fileSystems</span></a>.&quot;/boot&quot; =
+  { device = &quot;/dev/sda1&quot;;
+    fsType = &quot;ext4&quot;;
+    options = [ &quot;rw&quot; &quot;data=ordered&quot; &quot;relatime&quot; ];
+  };
+</pre>
+</div></blockquote>
+<p>Lists</p>
+<blockquote>
+<div><p>The important thing to note about lists is that list elements are
+separated by whitespace, like this:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-boot-kernelmodules"><span class="std std-ref">boot.kernelModules</span></a>  = [ &quot;fuse&quot; &quot;kvm-intel&quot; &quot;coretemp&quot; ];
+</pre>
+<p>List elements can be any other type, e.g. sets:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">swapDevices</span> <span class="o">=</span> <span class="p">[</span> <span class="p">{</span> <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;/dev/disk/by-label/swap&quot;</span><span class="p">;</span> <span class="p">}</span> <span class="p">];</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Packages</p>
+<blockquote>
+<div><p>Usually, the packages you need are already part of the Nix Packages
+collection, which is a set that can be accessed through the function
+argument <code class="docutils literal notranslate"><span class="pre">pkgs</span></code>. Typical uses:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-environment-systempackages"><span class="std std-ref">environment.systemPackages</span></a>  =
+  [ pkgs.thunderbird
+    pkgs.emacs
+  ];
+
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-postgresql-package"><span class="std std-ref">services.postgresql.package</span></a>  = pkgs.postgresql_10;
+</pre>
+<p>The latter option definition changes the default PostgreSQL package used
+by NixOS’s PostgreSQL service to 10.x. For more information on
+packages, including how to add new ones, see
+<a class="reference internal" href="adding-custom-packages.xml.html#sec-custom-packages"><span class="std std-ref">Adding Custom Packages</span></a>.</p>
+</div></blockquote>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="configuration.xml.html">Configuration</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="config-syntax.xml.html">Configuration Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="package-mgmt.xml.html">Package Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-mgmt.xml.html">User Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file-systems.xml.html">File Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="x-windows.xml.html">X Window System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xfce.xml.html">Xfce Desktop Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="networking.xml.html">Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linux-kernel.xml.html">Linux Kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix.xml.html">Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profiles.xml.html">Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kubernetes.xml.html">Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="configuration.xml.html">Configuration</a><ul>
+  <li><a href="config-syntax.xml.html">Configuration Syntax</a><ul>
+      <li>Previous: <a href="config-syntax.xml.html" title="previous chapter">Configuration Syntax</a></li>
+      <li>Next: <a href="abstractions.xml.html" title="next chapter">Abstractions</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/configuration/config-file.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,204 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Customising Packages &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Adding Custom Packages" href="adding-custom-packages.xml.html" />
+    <link rel="prev" title="Declarative Package Management" href="declarative-packages.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="customising-packages">
+<span id="sec-customising-packages"></span><h1>Customising Packages<a class="headerlink" href="#customising-packages" title="Permalink to this headline">¶</a></h1>
+<p>Some packages in Nixpkgs have options to enable or disable optional
+functionality or change other aspects of the package. For instance, the
+Firefox wrapper package (which provides Firefox with a set of plugins such as
+the Adobe Flash player) has an option to enable the Google Talk plugin. It
+can be set in <code class="file docutils literal notranslate"><span class="pre">configuration.nix</span></code> as follows: :file:<a href="#id1"><span class="problematic" id="id2">`</span></a></p>
+<blockquote>
+<div>nixpkgs.config.firefox.enableGoogleTalkPlugin = true; `</div></blockquote>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Unfortunately, Nixpkgs currently lacks a way to query available
+configuration options.</p>
+</div>
+<p>Apart from high-level options, it’s possible to tweak a package in almost
+arbitrary ways, such as changing or disabling dependencies of a package. For
+instance, the Emacs package in Nixpkgs by default has a dependency on GTK 2.
+If you want to build it against GTK 3, you can specify that as follows:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-environment-systempackages"><span class="std std-ref">environment.systemPackages</span></a>  = [ (pkgs.emacs.override { gtk = pkgs.gtk3; }) ];
+</pre>
+<p>The function <code class="docutils literal notranslate"><span class="pre">override</span></code> performs the call to the Nix
+function that produces Emacs, with the original arguments amended by the set
+of arguments specified by you. So here the function argument
+<code class="docutils literal notranslate"><span class="pre">gtk</span></code> gets the value <code class="docutils literal notranslate"><span class="pre">pkgs.gtk3</span></code>, causing
+Emacs to depend on GTK 3. (The parentheses are necessary because in Nix,
+function application binds more weakly than list construction, so without
+them, <a class="reference internal" href="../generated/options-db.xml.html#opt-environment-systempackages"><span class="std std-ref">environment.systemPackages</span></a> would be a list with
+two elements.)</p>
+<p>Even greater customisation is possible using the function
+<code class="docutils literal notranslate"><span class="pre">overrideAttrs</span></code>. While the <code class="docutils literal notranslate"><span class="pre">override</span></code>
+mechanism above overrides the arguments of a package function,
+<code class="docutils literal notranslate"><span class="pre">overrideAttrs</span></code> allows changing the
+<em>attributes</em> passed to <code class="docutils literal notranslate"><span class="pre">mkDerivation</span></code>.
+This permits changing any aspect of the package, such as the source code. For
+instance, if you want to override the source code of Emacs, you can say:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-environment-systempackages"><span class="std std-ref">environment.systemPackages</span></a>  = [
+  (pkgs.emacs.overrideAttrs (oldAttrs: {
+    name = &quot;emacs-25.0-pre&quot;;
+    src = /path/to/my/emacs/tree;
+  }))
+];
+</pre>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">overrideAttrs</span></code> takes the Nix derivation specified by
+<code class="docutils literal notranslate"><span class="pre">pkgs.emacs</span></code> and produces a new derivation in which the
+original’s <code class="docutils literal notranslate"><span class="pre">name</span></code> and <code class="docutils literal notranslate"><span class="pre">src</span></code> attribute
+have been replaced by the given values by re-calling
+<code class="docutils literal notranslate"><span class="pre">stdenv.mkDerivation</span></code>. The original attributes are
+accessible via the function argument, which is conventionally named
+<code class="docutils literal notranslate"><span class="pre">oldAttrs</span></code>.</p>
+<p>The overrides shown above are not global. They do not affect the original
+package; other packages in Nixpkgs continue to depend on the original rather
+than the customised package. This means that if another package in your
+system depends on the original package, you end up with two instances of the
+package. If you want to have everything depend on your customised instance,
+you can apply a <em>global</em> override as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nixpkgs</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">packageOverrides</span> <span class="o">=</span> <span class="n">pkgs</span><span class="p">:</span>
+<span class="p">{</span> <span class="n">emacs</span> <span class="o">=</span> <span class="n">pkgs</span><span class="o">.</span><span class="n">emacs</span><span class="o">.</span><span class="n">override</span> <span class="p">{</span> <span class="n">gtk</span> <span class="o">=</span> <span class="n">pkgs</span><span class="o">.</span><span class="n">gtk3</span><span class="p">;</span> <span class="p">};</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>The effect of this definition is essentially equivalent to modifying the
+<code class="docutils literal notranslate"><span class="pre">emacs</span></code> attribute in the Nixpkgs source tree. Any package in
+Nixpkgs that depends on <code class="docutils literal notranslate"><span class="pre">emacs</span></code> will be passed your
+customised instance. (However, the value <code class="docutils literal notranslate"><span class="pre">pkgs.emacs</span></code> in
+<code class="docutils literal notranslate"><span class="pre">nixpkgs.config.packageOverrides</span></code> refers to the original
+rather than overridden instance, to prevent an infinite recursion.)</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="configuration.xml.html">Configuration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config-syntax.xml.html">Configuration Syntax</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="package-mgmt.xml.html">Package Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-mgmt.xml.html">User Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file-systems.xml.html">File Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="x-windows.xml.html">X Window System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xfce.xml.html">Xfce Desktop Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="networking.xml.html">Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linux-kernel.xml.html">Linux Kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix.xml.html">Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profiles.xml.html">Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kubernetes.xml.html">Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="configuration.xml.html">Configuration</a><ul>
+  <li><a href="package-mgmt.xml.html">Package Management</a><ul>
+  <li><a href="declarative-packages.xml.html">Declarative Package Management</a><ul>
+      <li>Previous: <a href="declarative-packages.xml.html" title="previous chapter">Declarative Package Management</a></li>
+      <li>Next: <a href="adding-custom-packages.xml.html" title="next chapter">Adding Custom Packages</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/configuration/customizing-packages.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

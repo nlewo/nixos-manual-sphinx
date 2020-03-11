@@ -1,0 +1,362 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>X Window System &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Xfce Desktop Environment" href="xfce.xml.html" />
+    <link rel="prev" title="LUKS-Encrypted File Systems" href="luks-file-systems.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="x-window-system">
+<span id="sec-x11"></span><h1>X Window System<a class="headerlink" href="#x-window-system" title="Permalink to this headline">¶</a></h1>
+<p>The X Window System (X11) provides the basis of NixOS’ graphical user
+interface. It can be enabled as follows:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-enable"><span class="std std-ref">services.xserver.enable</span></a>  = true;
+</pre>
+<p>The X server will automatically detect and use the appropriate video driver
+from a set of X.org drivers (such as <code class="docutils literal notranslate"><span class="pre">vesa</span></code> and
+<code class="docutils literal notranslate"><span class="pre">intel</span></code>). You can also specify a driver manually, e.g.</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-videodrivers"><span class="std std-ref">services.xserver.videoDrivers</span></a>  = [ &quot;r128&quot; ];
+</pre>
+<p>to enable X.org’s <code class="docutils literal notranslate"><span class="pre">xf86-video-r128</span></code> driver.</p>
+<p>You also need to enable at least one desktop or window manager. Otherwise,
+you can only log into a plain undecorated <strong class="command">xterm</strong> window.
+Thus you should pick one or more of the following lines:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-desktopmanager-plasma5-enable"><span class="std std-ref">services.xserver.desktopManager.plasma5.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-desktopmanager-xfce-enable"><span class="std std-ref">services.xserver.desktopManager.xfce.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-desktopmanager-gnome3-enable"><span class="std std-ref">services.xserver.desktopManager.gnome3.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-desktopmanager-mate-enable"><span class="std std-ref">services.xserver.desktopManager.mate.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-windowmanager-xmonad-enable"><span class="std std-ref">services.xserver.windowManager.xmonad.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-windowmanager-twm-enable"><span class="std std-ref">services.xserver.windowManager.twm.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-windowmanager-icewm-enable"><span class="std std-ref">services.xserver.windowManager.icewm.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-windowmanager-i3-enable"><span class="std std-ref">services.xserver.windowManager.i3.enable</span></a>  = true;
+</pre>
+<p>NixOS’s default <em>display manager</em> (the program that
+provides a graphical login prompt and manages the X server) is LightDM. You
+can select an alternative one by picking one of the following lines:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-displaymanager-sddm-enable"><span class="std std-ref">services.xserver.displayManager.sddm.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-displaymanager-gdm-enable"><span class="std std-ref">services.xserver.displayManager.gdm.enable</span></a>  = true;
+</pre>
+<p>You can set the keyboard layout (and optionally the layout variant):</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-layout"><span class="std std-ref">services.xserver.layout</span></a>  = &quot;de&quot;;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-xkbvariant"><span class="std std-ref">services.xserver.xkbVariant</span></a>  = &quot;neo&quot;;
+</pre>
+<p>The X server is started automatically at boot time. If you don’t want this
+to happen, you can set:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-autorun"><span class="std std-ref">services.xserver.autorun</span></a>  = false;
+</pre>
+<p>The X server can then be started manually:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># systemctl start display-manager.service</span>
+</pre></div>
+</div>
+<p>On 64-bit systems, if you want OpenGL for 32-bit programs such as in Wine,
+you should also set the following:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-hardware-opengl-drisupport32bit"><span class="std std-ref">hardware.opengl.driSupport32Bit</span></a>  = true;
+</pre>
+<div class="section" id="auto-login">
+<h2>Auto-login<a class="headerlink" href="#auto-login" title="Permalink to this headline">¶</a></h2>
+<p>The x11 login screen can be skipped entirely, automatically logging you into
+your window manager and desktop environment when you boot your computer.</p>
+<p>This is especially helpful if you have disk encryption enabled. Since you
+already have to provide a password to decrypt your disk, entering a second
+password to login can be redundant.</p>
+<p>To enable auto-login, you need to define your default window manager and
+desktop environment. If you wanted no desktop environment and i3 as your your
+window manager, you’d define:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-displaymanager-defaultsession"><span class="std std-ref">services.xserver.displayManager.defaultSession</span></a>  = &quot;none+i3&quot;;
+</pre>
+<p>Every display manager in NixOS supports auto-login, here is an example
+using lightdm for a user <code class="docutils literal notranslate"><span class="pre">alice</span></code>:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-displaymanager-lightdm-enable"><span class="std std-ref">services.xserver.displayManager.lightdm.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-displaymanager-lightdm-autologin-enable"><span class="std std-ref">services.xserver.displayManager.lightdm.autoLogin.enable</span></a>  = true;
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-displaymanager-lightdm-autologin-user"><span class="std std-ref">services.xserver.displayManager.lightdm.autoLogin.user</span></a>  = &quot;alice&quot;;
+</pre>
+<p>The options are named identically for all other display managers.</p>
+</div>
+<div class="section" id="proprietary-nvidia-drivers">
+<h2>Proprietary NVIDIA drivers<a class="headerlink" href="#proprietary-nvidia-drivers" title="Permalink to this headline">¶</a></h2>
+<p>NVIDIA provides a proprietary driver for its graphics cards that has better
+3D performance than the X.org drivers. It is not enabled by default because
+it’s not free software. You can enable it as follows:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-videodrivers"><span class="std std-ref">services.xserver.videoDrivers</span></a>  = [ &quot;nvidia&quot; ];
+</pre>
+<p>Or if you have an older card, you may have to use one of the legacy drivers:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-videodrivers"><span class="std std-ref">services.xserver.videoDrivers</span></a>  = [ &quot;nvidiaLegacy390&quot; ];
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-videodrivers"><span class="std std-ref">services.xserver.videoDrivers</span></a>  = [ &quot;nvidiaLegacy340&quot; ];
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-videodrivers"><span class="std std-ref">services.xserver.videoDrivers</span></a>  = [ &quot;nvidiaLegacy304&quot; ];
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-videodrivers"><span class="std std-ref">services.xserver.videoDrivers</span></a>  = [ &quot;nvidiaLegacy173&quot; ];
+</pre>
+<p>You may need to reboot after enabling this driver to prevent a clash with
+other kernel modules.</p>
+</div>
+<div class="section" id="proprietary-amd-drivers">
+<h2>Proprietary AMD drivers<a class="headerlink" href="#proprietary-amd-drivers" title="Permalink to this headline">¶</a></h2>
+<p>AMD provides a proprietary driver for its graphics cards that has better 3D
+performance than the X.org drivers. It is not enabled by default because
+it’s not free software. You can enable it as follows:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-videodrivers"><span class="std std-ref">services.xserver.videoDrivers</span></a>  = [ &quot;ati_unfree&quot; ];
+</pre>
+<p>You will need to reboot after enabling this driver to prevent a clash with
+other kernel modules.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For recent AMD GPUs you most likely want to keep either the defaults
+or <code class="docutils literal notranslate"><span class="pre">&quot;amdgpu&quot;</span></code> (both free).</p>
+</div>
+</div>
+<div class="section" id="touchpads">
+<h2>Touchpads<a class="headerlink" href="#touchpads" title="Permalink to this headline">¶</a></h2>
+<p>Support for Synaptics touchpads (found in many laptops such as the Dell
+Latitude series) can be enabled as follows:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-libinput-enable"><span class="std std-ref">services.xserver.libinput.enable</span></a>  = true;
+</pre>
+<p>The driver has many options (see <span class="xref std std-ref">ch-options</span>). For
+instance, the following disables tap-to-click behavior:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-libinput-tapping"><span class="std std-ref">services.xserver.libinput.tapping</span></a>  = false;
+</pre>
+<p>Note: the use of <code class="docutils literal notranslate"><span class="pre">services.xserver.synaptics</span></code> is deprecated
+since NixOS 17.09.</p>
+</div>
+<div class="section" id="gtk-qt-themes">
+<h2>GTK/Qt themes<a class="headerlink" href="#gtk-qt-themes" title="Permalink to this headline">¶</a></h2>
+<p>GTK themes can be installed either to user profile or system-wide (via
+<code class="docutils literal notranslate"><span class="pre">environment.systemPackages</span></code>). To make Qt 5 applications
+look similar to GTK2 ones, you can install <code class="docutils literal notranslate"><span class="pre">qt5.qtbase.gtk</span></code>
+package into your system environment. It should work for all Qt 5 library
+versions.</p>
+</div>
+<div class="section" id="custom-xkb-layouts">
+<h2>Custom XKB layouts<a class="headerlink" href="#custom-xkb-layouts" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to install custom
+<a class="reference external" href="https://en.wikipedia.org/wiki/X_keyboard_extension">XKB</a>
+keyboard layouts using the option
+.
+As a first example, we are going to create a layout based on the basic US
+layout, with an additional layer to type some greek symbols by pressing the
+right-alt key.</p>
+<p>To do this we are going to create a <code class="docutils literal notranslate"><span class="pre">us-greek</span></code> file
+with a <code class="docutils literal notranslate"><span class="pre">xkb_symbols</span></code> section.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xkb_symbols</span> <span class="s2">&quot;us-greek&quot;</span>
+<span class="p">{</span>
+  <span class="n">include</span> <span class="s2">&quot;us(basic)&quot;</span>            <span class="o">//</span> <span class="n">includes</span> <span class="n">the</span> <span class="n">base</span> <span class="n">US</span> <span class="n">keys</span>
+  <span class="n">include</span> <span class="s2">&quot;level3(ralt_switch)&quot;</span>  <span class="o">//</span> <span class="n">configures</span> <span class="n">right</span> <span class="n">alt</span> <span class="k">as</span> <span class="n">a</span> <span class="n">third</span> <span class="n">level</span> <span class="n">switch</span>
+
+  <span class="n">key</span> <span class="o">&lt;</span><span class="n">LatA</span><span class="o">&gt;</span> <span class="p">{</span> <span class="p">[</span> <span class="n">a</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">Greek_alpha</span> <span class="p">]</span> <span class="p">};</span>
+  <span class="n">key</span> <span class="o">&lt;</span><span class="n">LatB</span><span class="o">&gt;</span> <span class="p">{</span> <span class="p">[</span> <span class="n">b</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Greek_beta</span>  <span class="p">]</span> <span class="p">};</span>
+  <span class="n">key</span> <span class="o">&lt;</span><span class="n">LatG</span><span class="o">&gt;</span> <span class="p">{</span> <span class="p">[</span> <span class="n">g</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">Greek_gamma</span> <span class="p">]</span> <span class="p">};</span>
+  <span class="n">key</span> <span class="o">&lt;</span><span class="n">LatD</span><span class="o">&gt;</span> <span class="p">{</span> <span class="p">[</span> <span class="n">d</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">Greek_delta</span> <span class="p">]</span> <span class="p">};</span>
+  <span class="n">key</span> <span class="o">&lt;</span><span class="n">LatZ</span><span class="o">&gt;</span> <span class="p">{</span> <span class="p">[</span> <span class="n">z</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">Greek_zeta</span>  <span class="p">]</span> <span class="p">};</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>To install the layout, the filepath, a description and the list of
+languages must be given:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-extralayouts"><span class="std std-ref">services.xserver.extraLayouts</span></a>.us-greek = {
+  description = &quot;US layout with alt-gr greek&quot;;
+  languages   = [ &quot;eng&quot; ];
+  symbolsFile = /path/to/us-greek;
+}
+</pre>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The name should match the one given to the
+<code class="docutils literal notranslate"><span class="pre">xkb_symbols</span></code> block.</p>
+</div>
+<p>The layout should now be installed and ready to use: try it by
+running <code class="docutils literal notranslate"><span class="pre">setxkbmap</span> <span class="pre">us-greek</span></code> and type
+<code class="docutils literal notranslate"><span class="pre">&lt;alt&gt;+a</span></code>. To change the default the usual</p>
+<p>option can still be used.</p>
+<p>A layout can have several other components besides
+<code class="docutils literal notranslate"><span class="pre">xkb_symbols</span></code>, for example we will define new
+keycodes for some multimedia key and bind these to some symbol.</p>
+<p>Use the <em>xev</em> utility from
+<code class="docutils literal notranslate"><span class="pre">pkgs.xorg.xev</span></code> to find the codes of the keys of
+interest, then create a <code class="docutils literal notranslate"><span class="pre">media-key</span></code> file to hold
+the keycodes definitions</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xkb_keycodes</span> <span class="s2">&quot;media&quot;</span>
+<span class="p">{</span>
+ <span class="o">&lt;</span><span class="n">volUp</span><span class="o">&gt;</span>   <span class="o">=</span> <span class="mi">123</span><span class="p">;</span>
+ <span class="o">&lt;</span><span class="n">volDown</span><span class="o">&gt;</span> <span class="o">=</span> <span class="mi">456</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now use the newly define keycodes in <code class="docutils literal notranslate"><span class="pre">media-sym</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xkb_symbols</span> <span class="s2">&quot;media&quot;</span>
+<span class="p">{</span>
+ <span class="n">key</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;ONE_LEVEL&quot;</span><span class="p">;</span>
+ <span class="n">key</span> <span class="o">&lt;</span><span class="n">volUp</span><span class="o">&gt;</span>   <span class="p">{</span> <span class="p">[</span> <span class="n">XF86AudioLowerVolume</span> <span class="p">]</span> <span class="p">};</span>
+ <span class="n">key</span> <span class="o">&lt;</span><span class="n">volDown</span><span class="o">&gt;</span> <span class="p">{</span> <span class="p">[</span> <span class="n">XF86AudioRaiseVolume</span> <span class="p">]</span> <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>As before, to install the layout do</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-extralayouts"><span class="std std-ref">services.xserver.extraLayouts</span></a>.media = {
+  description  = &quot;Multimedia keys remapping&quot;;
+  languages    = [ &quot;eng&quot; ];
+  symbolsFile  = /path/to/media-key;
+  keycodesFile = /path/to/media-sym;
+};
+</pre>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The function <code class="docutils literal notranslate"><span class="pre">pkgs.writeText</span> <span class="pre">&lt;filename&gt;</span> <span class="pre">&lt;content&gt;</span></code> can be useful if you prefer to keep the layout definitions
+inside the NixOS configuration.</p>
+</div>
+<p>Unfortunately, the Xorg server does not (currently) support setting a
+keymap directly but relies instead on XKB rules to select the matching
+components (keycodes, types, …) of a layout. This means that components
+other than symbols won’t be loaded by default. As a workaround, you
+can set the keymap using <code class="docutils literal notranslate"><span class="pre">setxkbmap</span></code> at the start of the
+session with:</p>
+<pre class="literal-block">
+<a class="reference internal" href="../generated/options-db.xml.html#opt-services-xserver-displaymanager-sessioncommands"><span class="std std-ref">services.xserver.displayManager.sessionCommands</span></a>  = &quot;setxkbmap -keycodes media&quot;;
+</pre>
+<p>If you are manually starting the X server, you should set the argument
+<code class="docutils literal notranslate"><span class="pre">-xkbdir</span> <span class="pre">/etc/X11/xkb</span></code>, otherwise X won’t find your layout files.
+For example with <strong class="command">xinit</strong> run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ xinit -- -xkbdir /etc/X11/xkb
+</pre></div>
+</div>
+<p>To learn how to write layouts take a look at the XKB
+<a class="reference external" href="https://www.x.org/releases/current/doc/xorg-docs/input/XKB-Enhancing.html#Defining_New_Layouts">documentation</a>. More example layouts can also be found
+<a class="reference external" href="https://wiki.archlinux.org/index.php/X_KeyBoard_extension#Basic_examples">here</a>.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="configuration.xml.html">Configuration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config-syntax.xml.html">Configuration Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="package-mgmt.xml.html">Package Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-mgmt.xml.html">User Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file-systems.xml.html">File Systems</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">X Window System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xfce.xml.html">Xfce Desktop Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="networking.xml.html">Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linux-kernel.xml.html">Linux Kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix.xml.html">Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profiles.xml.html">Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kubernetes.xml.html">Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="configuration.xml.html">Configuration</a><ul>
+      <li>Previous: <a href="luks-file-systems.xml.html" title="previous chapter">LUKS-Encrypted File Systems</a></li>
+      <li>Next: <a href="xfce.xml.html" title="next chapter">Xfce Desktop Environment</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/configuration/x-windows.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

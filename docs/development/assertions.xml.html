@@ -1,0 +1,179 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Warnings and Assertions &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Meta Attributes" href="meta-attributes.xml.html" />
+    <link rel="prev" title="Option Definitions" href="option-def.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="warnings-and-assertions">
+<span id="sec-assertions"></span><h1>Warnings and Assertions<a class="headerlink" href="#warnings-and-assertions" title="Permalink to this headline">¶</a></h1>
+<p>When configuration problems are detectable in a module, it is a good idea to
+write an assertion or warning. Doing so provides clear feedback to the user
+and prevents errors after the build.</p>
+<p>Although Nix has the <code class="docutils literal notranslate"><span class="pre">abort</span></code> and
+<code class="docutils literal notranslate"><span class="pre">builtins.trace</span></code>
+<a class="reference external" href="https://nixos.org/nix/manual/#ssec-builtins">functions</a>
+to perform such tasks, they are not ideally suited for NixOS modules. Instead
+of these functions, you can declare your warnings and assertions using the
+NixOS module system.</p>
+</div>
+<div class="section" id="warnings">
+<span id="sec-assertions-warnings"></span><h1>Warnings<a class="headerlink" href="#warnings" title="Permalink to this headline">¶</a></h1>
+<p>This is an example of using <code class="docutils literal notranslate"><span class="pre">warnings</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="n">config</span><span class="p">,</span> <span class="n">lib</span><span class="p">,</span> <span class="o">...</span> <span class="p">}:</span>
+<span class="p">{</span>
+  <span class="n">config</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">mkIf</span> <span class="n">config</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">enable</span> <span class="p">{</span>
+    <span class="n">warnings</span> <span class="o">=</span>
+      <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">foo</span><span class="o">.</span><span class="n">bar</span>
+      <span class="n">then</span> <span class="p">[</span> <span class="s1">&#39;&#39;</span><span class="n">You</span> <span class="n">have</span> <span class="n">enabled</span> <span class="n">the</span> <span class="n">bar</span> <span class="n">feature</span> <span class="n">of</span> <span class="n">the</span> <span class="n">foo</span> <span class="n">service</span><span class="o">.</span>
+               <span class="n">This</span> <span class="ow">is</span> <span class="n">known</span> <span class="n">to</span> <span class="n">cause</span> <span class="n">some</span> <span class="n">specific</span> <span class="n">problems</span> <span class="ow">in</span> <span class="n">certain</span> <span class="n">situations</span><span class="o">.</span>
+               <span class="s1">&#39;&#39;</span> <span class="p">]</span>
+      <span class="k">else</span> <span class="p">[];</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="assertions">
+<span id="sec-assertions-assertions"></span><h1>Assertions<a class="headerlink" href="#assertions" title="Permalink to this headline">¶</a></h1>
+<p>This example, extracted from the
+<a class="reference external" href="https://github.com/NixOS/nixpkgs/blob/release-17.09/nixos/modules/services/logging/syslogd.nix">syslogd module</a> shows how to use
+<code class="docutils literal notranslate"><span class="pre">assertions</span></code>. Since there can only be one active syslog
+daemon at a time, an assertion is useful to prevent such a broken system
+from being built.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{ config, lib, ... }:
+{
+  config = lib.mkIf config.services.syslogd.enable {
+    assertions =
+      [ { assertion = !config.services.rsyslogd.enable;
+          message = &quot;rsyslogd conflicts with syslogd&quot;;
+        }
+      ];
+  }
+}
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="development.xml.html">Development</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sources.xml.html">Getting the Sources</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="writing-modules.xml.html">Writing NixOS Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building-parts.xml.html">Building Specific Parts of NixOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-documentation.xml.html">Writing NixOS Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building-nixos.xml.html">Building Your Own NixOS CD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nixos-tests.xml.html">NixOS Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing-installer.xml.html">Testing the Installer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.xml.html">Releases</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="development.xml.html">Development</a><ul>
+  <li><a href="writing-modules.xml.html">Writing NixOS Modules</a><ul>
+      <li>Previous: <a href="option-def.xml.html" title="previous chapter">Option Definitions</a></li>
+      <li>Next: <a href="meta-attributes.xml.html" title="next chapter">Meta Attributes</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/development/assertions.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

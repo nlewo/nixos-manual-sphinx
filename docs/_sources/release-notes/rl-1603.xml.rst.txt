@@ -1,0 +1,582 @@
+
+
+.. _sec-release-16.03:
+
+Release 16.03 (“Emu”, 2016/03/31)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to numerous new and upgraded packages, this release has the
+following highlights:
+
+-
+
+  Systemd 229, bringing
+  `numerous
+  improvements <https://github.com/systemd/systemd/blob/v229/NEWS>`_ over 217.
+
+-
+
+  Linux 4.4 (was 3.18).
+
+-
+
+  GCC 5.3 (was 4.9). Note that GCC 5
+  `changes
+  the C++ ABI in an incompatible way <https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html>`_; this may cause problems if you
+  try to link objects compiled with different versions of GCC.
+
+-
+
+  Glibc 2.23 (was 2.21).
+
+-
+
+  Binutils 2.26 (was 2.23.1). See #909
+
+-
+
+  Improved support for ensuring
+  `bitwise
+  reproducible builds <https://reproducible-builds.org/>`_. For example, ``stdenv`` now sets
+  the environment variable
+  SOURCE_DATE_EPOCH
+  to a deterministic value, and Nix has
+  `gained
+  an option <http://nixos.org/nix/manual/#ssec-relnotes-1.11>`_ to repeat a build a number of times to test determinism.
+  An ongoing project, the goal of exact reproducibility is to allow binaries
+  to be verified independently (e.g., a user might only trust binaries that
+  appear in three independent binary caches).
+
+-
+
+  Perl 5.22.
+
+The following new services were added since the last release:
+
+-
+
+  ``services/monitoring/longview.nix``
+
+-
+
+  ``hardware/video/webcam/facetimehd.nix``
+
+-
+
+  ``i18n/input-method/default.nix``
+
+-
+
+  ``i18n/input-method/fcitx.nix``
+
+-
+
+  ``i18n/input-method/ibus.nix``
+
+-
+
+  ``i18n/input-method/nabi.nix``
+
+-
+
+  ``i18n/input-method/uim.nix``
+
+-
+
+  ``programs/fish.nix``
+
+-
+
+  ``security/acme.nix``
+
+-
+
+  ``security/audit.nix``
+
+-
+
+  ``security/oath.nix``
+
+-
+
+  ``services/hardware/irqbalance.nix``
+
+-
+
+  ``services/mail/dspam.nix``
+
+-
+
+  ``services/mail/opendkim.nix``
+
+-
+
+  ``services/mail/postsrsd.nix``
+
+-
+
+  ``services/mail/rspamd.nix``
+
+-
+
+  ``services/mail/rmilter.nix``
+
+-
+
+  ``services/misc/autofs.nix``
+
+-
+
+  ``services/misc/bepasty.nix``
+
+-
+
+  ``services/misc/calibre-server.nix``
+
+-
+
+  ``services/misc/cfdyndns.nix``
+
+-
+
+  ``services/misc/gammu-smsd.nix``
+
+-
+
+  ``services/misc/mathics.nix``
+
+-
+
+  ``services/misc/matrix-synapse.nix``
+
+-
+
+  ``services/misc/octoprint.nix``
+
+-
+
+  ``services/monitoring/hdaps.nix``
+
+-
+
+  ``services/monitoring/heapster.nix``
+
+-
+
+  ``services/monitoring/longview.nix``
+
+-
+
+  ``services/network-filesystems/netatalk.nix``
+
+-
+
+  ``services/network-filesystems/xtreemfs.nix``
+
+-
+
+  ``services/networking/autossh.nix``
+
+-
+
+  ``services/networking/dnschain.nix``
+
+-
+
+  ``services/networking/gale.nix``
+
+-
+
+  ``services/networking/miniupnpd.nix``
+
+-
+
+  ``services/networking/namecoind.nix``
+
+-
+
+  ``services/networking/ostinato.nix``
+
+-
+
+  ``services/networking/pdnsd.nix``
+
+-
+
+  ``services/networking/shairport-sync.nix``
+
+-
+
+  ``services/networking/supplicant.nix``
+
+-
+
+  ``services/search/kibana.nix``
+
+-
+
+  ``services/security/haka.nix``
+
+-
+
+  ``services/security/physlock.nix``
+
+-
+
+  ``services/web-apps/pump.io.nix``
+
+-
+
+  ``services/x11/hardware/libinput.nix``
+
+-
+
+  ``services/x11/window-managers/windowlab.nix``
+
+-
+
+  ``system/boot/initrd-network.nix``
+
+-
+
+  ``system/boot/initrd-ssh.nix``
+
+-
+
+  ``system/boot/loader/loader.nix``
+
+-
+
+  ``system/boot/networkd.nix``
+
+-
+
+  ``system/boot/resolved.nix``
+
+-
+
+  ``virtualisation/lxd.nix``
+
+-
+
+  ``virtualisation/rkt.nix``
+
+When upgrading from a previous release, please be aware of the following
+incompatible changes:
+
+-
+
+  We no longer produce graphical ISO images and VirtualBox images for
+  ``i686-linux``. A minimal ISO image is still provided.
+
+-
+
+  Firefox and similar browsers are now *wrapped by
+  default*. The package and attribute names are plain
+  ``firefox`` or ``midori``, etc.
+  Backward-compatibility attributes were set up, but note that
+  :command:`nix-env -u` will *not* update your
+  current ``firefox-with-plugins``; you have to uninstall it
+  and install ``firefox`` instead.
+
+-
+
+  :command:`wmiiSnap` has been replaced with
+  :command:`wmii_hg`, but
+  :command:`services.xserver.windowManager.wmii.enable` has been
+  updated respectively so this only affects you if you have explicitly
+  installed :command:`wmiiSnap`.
+
+-
+
+  ``jobs`` NixOS option has been removed. It served as
+  compatibility layer between Upstart jobs and SystemD services. All services
+  have been rewritten to use ``systemd.services``
+
+-
+
+  :command:`wmiimenu` is removed, as it has been removed by the
+  developers upstream. Use :command:`wimenu` from the
+  :command:`wmii-hg` package.
+
+-
+
+  Gitit is no longer automatically added to the module list in NixOS and as
+  such there will not be any manual entries for it. You will need to add an
+  import statement to your NixOS configuration in order to use it, e.g.
+
+  ::
+
+      {
+        imports = [ <nixpkgs/nixos/modules/services/misc/gitit.nix> ];
+      }
+
+  will include the Gitit service configuration options.
+
+-
+
+  :command:`nginx` does not accept flags for enabling and disabling
+  modules anymore. Instead it accepts ``modules`` argument,
+  which is a list of modules to be built in. All modules now reside in
+  ``nginxModules`` set. Example configuration:
+
+  ::
+
+      nginx.override {
+        modules = [ nginxModules.rtmp nginxModules.dav nginxModules.moreheaders ];
+      }
+
+-
+
+  :command:`s3sync` is removed, as it hasn't been developed by
+  upstream for 4 years and only runs with ruby 1.8. For an actively-developer
+  alternative look at :command:`tarsnap` and others.
+
+-
+
+  :command:`ruby_1_8` has been removed as it's not supported from
+  upstream anymore and probably contains security issues.
+
+-
+
+  ``tidy-html5`` package is removed. Upstream only provided
+  ``(lib)tidy5`` during development, and now they went back to
+  ``(lib)tidy`` to work as a drop-in replacement of the
+  original package that has been unmaintained for years. You can (still) use
+  the ``html-tidy`` package, which got updated to a stable
+  release from this new upstream.
+
+-
+
+  ``extraDeviceOptions`` argument is removed from
+  ``bumblebee`` package. Instead there are now two separate
+  arguments: ``extraNvidiaDeviceOptions`` and
+  ``extraNouveauDeviceOptions`` for setting extra X11 options
+  for nvidia and nouveau drivers, respectively.
+
+-
+
+  The ``Ctrl+Alt+Backspace`` key combination no longer kills
+  the X server by default. There's a new option
+  allowing to enable
+  the combination again.
+
+-
+
+  ``emacsPackagesNg`` now contains all packages from the ELPA,
+  MELPA, and MELPA Stable repositories.
+
+-
+
+  Data directory for Postfix MTA server is moved from
+  :file:`/var/postfix` to :file:`/var/lib/postfix`.
+  Old configurations are migrated automatically.
+  ``service.postfix`` module has also received many
+  improvements, such as correct directories' access rights, new
+  ``aliasFiles`` and ``mapFiles`` options and
+  more.
+
+-
+
+  Filesystem options should now be configured as a list of strings, not a
+  comma-separated string. The old style will continue to work, but print a
+  warning, until the 16.09 release. An example of the new style:
+
+  ::
+
+      fileSystems."/example" = {
+        device = "/dev/sdc";
+        fsType = "btrfs";
+        options = [ "noatime" "compress=lzo" "space_cache" "autodefrag" ];
+      };
+
+-
+
+  CUPS, installed by ``services.printing`` module, now has its
+  data directory in :file:`/var/lib/cups`. Old configurations
+  from :file:`/etc/cups` are moved there automatically, but
+  there might be problems. Also configuration options
+  ``services.printing.cupsdConf`` and
+  ``services.printing.cupsdFilesConf`` were removed because
+  they had been allowing one to override configuration variables required for
+  CUPS to work at all on NixOS. For most use cases,
+  ``services.printing.extraConf`` and new option
+  ``services.printing.extraFilesConf`` should be enough; if
+  you encounter a situation when they are not, please file a bug.
+
+  There are also Gutenprint improvements; in particular, a new option
+  ``services.printing.gutenprint`` is added to enable
+  automatic updating of Gutenprint PPMs; it's greatly recommended to enable
+  it instead of adding ``gutenprint`` to the
+  ``drivers`` list.
+
+-
+
+  ``services.xserver.vaapiDrivers`` has been removed. Use
+  ``hardware.opengl.extraPackages{,32}`` instead. You can also
+  specify VDPAU drivers there.
+
+-
+
+  ``programs.ibus`` moved to
+  ``i18n.inputMethod.ibus``. The option
+  ``programs.ibus.plugins`` changed to
+  ``i18n.inputMethod.ibus.engines`` and the option to enable
+  ibus changed from ``programs.ibus.enable`` to
+  ``i18n.inputMethod.enabled``.
+  ``i18n.inputMethod.enabled`` should be set to the used input
+  method name, ``"ibus"`` for ibus. An example of the new
+  style:
+
+  ::
+
+      i18n.inputMethod.enabled = "ibus";
+      i18n.inputMethod.ibus.engines = with pkgs.ibus-engines; [ anthy mozc ];
+
+  That is equivalent to the old version:
+
+  ::
+
+      programs.ibus.enable = true;
+      programs.ibus.plugins = with pkgs; [ ibus-anthy mozc ];
+
+-
+
+  ``services.udev.extraRules`` option now writes rules to
+  :file:`99-local.rules` instead of
+  :file:`10-local.rules`. This makes all the user rules apply
+  after others, so their results wouldn't be overriden by anything else.
+
+-
+
+  Large parts of the ``services.gitlab`` module has been been
+  rewritten. There are new configuration options available. The
+  ``stateDir`` option was renamned to
+  ``statePath`` and the ``satellitesDir``
+  option was removed. Please review the currently available options.
+
+-
+
+  The option no longer
+  interpret the dollar sign ($) as a shell variable, as such it should not be
+  escaped anymore. Thus the following zone data:
+
+  ::
+
+      \$ORIGIN example.com.
+      \$TTL 1800
+      @       IN      SOA     ns1.vpn.nbp.name.      admin.example.com. (
+
+  Should modified to look like the actual file expected by nsd:
+
+  ::
+
+      $ORIGIN example.com.
+      $TTL 1800
+      @       IN      SOA     ns1.vpn.nbp.name.      admin.example.com. (
+
+-
+
+  ``service.syncthing.dataDir`` options now has to point to
+  exact folder where syncthing is writing to. Example configuration should
+  look something like:
+
+  ::
+
+      services.syncthing = {
+          enable = true;
+          dataDir = "/home/somebody/.syncthing";
+          user = "somebody";
+      };
+
+-
+
+  ``networking.firewall.allowPing`` is now enabled by default.
+  Users are encouraged to configure an appropriate rate limit for their
+  machines using the Kernel interface at
+  :file:`/proc/sys/net/ipv4/icmp_ratelimit` and
+  :file:`/proc/sys/net/ipv6/icmp/ratelimit` or using the
+  firewall itself, i.e. by setting the NixOS option
+  ``networking.firewall.pingLimit``.
+
+-
+
+  Systems with some broadcom cards used to result into a generated config
+  that is no longer accepted. If you get errors like
+  ::
+
+      error: path ‘/nix/store/\*-broadcom-sta-\*’ does not exist and cannot be created
+
+  you should either re-run :command:`nixos-generate-config` or
+  manually replace
+  ``"${config.boot.kernelPackages.broadcom_sta}"`` by
+  ``config.boot.kernelPackages.broadcom_sta`` in your
+  :file:`/etc/nixos/hardware-configuration.nix`. More discussion
+  is on `the
+  github issue <https://github.com/NixOS/nixpkgs/pull/12595>`_.
+
+-
+
+  The ``services.xserver.startGnuPGAgent`` option has been
+  removed. GnuPG 2.1.x changed the way the gpg-agent works, and that new
+  approach no longer requires (or even supports) the "start everything as a
+  child of the agent" scheme we've implemented in NixOS for older versions.
+  To configure the gpg-agent for your X session, add the following code to
+  :file:`~/.bashrc` or some file that’s sourced when your
+  shell is started:
+
+  ::
+
+      GPG_TTY=$(tty)
+      export GPG_TTY
+
+  If you want to use gpg-agent for SSH, too, add the following to your
+  session initialization (e.g.
+  ``displayManager.sessionCommands``)
+
+  ::
+
+      gpg-connect-agent /bye
+      unset SSH_AGENT_PID
+      export SSH_AUTH_SOCK="''${HOME}/.gnupg/S.gpg-agent.ssh"
+
+  and make sure that
+
+  ::
+
+      enable-ssh-support
+
+  is included in your :file:`~/.gnupg/gpg-agent.conf`. You will
+  need to use :command:`ssh-add` to re-add your ssh keys. If gpg’s
+  automatic transformation of the private keys to the new format fails, you
+  will need to re-import your private keyring as well:
+
+  ::
+
+      gpg --import ~/.gnupg/secring.gpg
+
+  The :command:`gpg-agent(1)` man page has more details about this
+  subject, i.e. in the "EXAMPLES" section.
+
+Other notable improvements:
+
+-
+  <listitem>
+  <para>The <command>command-not-found</command> hook was extended.
+  Apart from <literal>$NIX_AUTO_INSTALL</literal> variable,
+  it newly also checks for <literal>$NIX_AUTO_RUN</literal>
+  which causes it to directly run the missing commands via
+  <command>nix-shell</command> (without installing anything).</para>
+  </listitem>
+
+-
+
+  ``ejabberd`` module is brought back and now works on NixOS.
+
+-
+
+  Input method support was improved. New NixOS modules (fcitx, nabi and
+  uim), fcitx engines (chewing, hangul, m17n, mozc and table-other) and ibus
+  engines (hangul and m17n) have been added.
+
+

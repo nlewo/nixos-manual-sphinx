@@ -1,0 +1,304 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Matrix &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Profiles" href="profiles.xml.html" />
+    <link rel="prev" title="Linux Kernel" href="linux-kernel.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="matrix">
+<span id="module-services-matrix"></span><h1>Matrix<a class="headerlink" href="#matrix" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://matrix.org/">Matrix</a> is an open standard for
+interoperable, decentralised, real-time communication over IP. It can be used
+to power Instant Messaging, VoIP/WebRTC signalling, Internet of Things
+communication - or anywhere you need a standard HTTP API for publishing and
+subscribing to data whilst tracking the conversation history.</p>
+<p>This chapter will show you how to set up your own, self-hosted Matrix
+homeserver using the Synapse reference homeserver, and how to serve your own
+copy of the Riot web client. See the
+<a class="reference external" href="https://matrix.org/docs/projects/try-matrix-now.html">Try
+Matrix Now!</a> overview page for links to Riot Apps for Android and iOS,
+desktop clients, as well as bridges to other networks and other projects
+around Matrix.</p>
+<div class="section" id="synapse-homeserver">
+<span id="module-services-matrix-synapse"></span><h2>Synapse Homeserver<a class="headerlink" href="#synapse-homeserver" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/matrix-org/synapse">Synapse</a> is
+the reference homeserver implementation of Matrix from the core development
+team at matrix.org. The following configuration example will set up a
+synapse server for the <code class="docutils literal notranslate"><span class="pre">example.org</span></code> domain, served from
+the host <code class="docutils literal notranslate"><span class="pre">myhostname.example.org</span></code>. For more information,
+please refer to the
+<a class="reference external" href="https://github.com/matrix-org/synapse#synapse-installation">installation instructions of Synapse</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>let
+  fqdn =
+    let
+      join = hostName: domain: hostName + optionalString (domain != null) &quot;.${domain}&quot;;
+    in join config.networking.hostName config.networking.domain;
+in {
+  networking = {
+    hostName = &quot;myhostname&quot;;
+    domain = &quot;example.org&quot;;
+  };
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
+
+  services.nginx = {
+    enable = true;
+    # only recommendedProxySettings and recommendedGzipSettings are strictly required,
+    # but the rest make sense as well
+    recommendedTlsSettings = true;
+    recommendedOptimisation = true;
+    recommendedGzipSettings = true;
+    recommendedProxySettings = true;
+
+    virtualHosts = {
+      # This host section can be placed on a different host than the rest,
+      # i.e. to delegate from the host being accessible as ${config.networking.domain}
+      # to another host actually running the Matrix homeserver.
+      &quot;${config.networking.domain}&quot; = {
+        locations.&quot;= /.well-known/matrix/server&quot;.extraConfig =
+          let
+            # use 443 instead of the default 8448 port to unite
+            # the client-server and server-server port for simplicity
+            server = { &quot;m.server&quot; = &quot;${fqdn}:443&quot;; };
+          in &#39;&#39;
+            add_header Content-Type application/json;
+            return 200 &#39;${builtins.toJSON server}&#39;;
+          &#39;&#39;;
+        locations.&quot;= /.well-known/matrix/client&quot;.extraConfig =
+          let
+            client = {
+              &quot;m.homeserver&quot; =  { &quot;base_url&quot; = &quot;https://${fqdn}&quot;; };
+              &quot;m.identity_server&quot; =  { &quot;base_url&quot; = &quot;https://vector.im&quot;; };
+            };
+          # ACAO required to allow riot-web on any URL to request this json file
+          in &#39;&#39;
+            add_header Content-Type application/json;
+            add_header Access-Control-Allow-Origin *;
+            return 200 &#39;${builtins.toJSON client}&#39;;
+          &#39;&#39;;
+      };
+
+      # Reverse proxy for Matrix client-server and server-server communication
+      ${fqdn} = {
+        enableACME = true;
+        forceSSL = true;
+
+        # Or do a redirect instead of the 404, or whatever is appropriate for you.
+        # But do not put a Matrix Web client here! See the Riot Web section below.
+        locations.&quot;/&quot;.extraConfig = &#39;&#39;
+          return 404;
+        &#39;&#39;;
+
+        # forward all Matrix API calls to the synapse Matrix homeserver
+        locations.&quot;/_matrix&quot; = {
+          proxyPass = &quot;http://[::1]:8008&quot;; # without a trailing /
+        };
+      };
+    };
+  };
+  services.matrix-synapse = {
+    enable = true;
+    server_name = config.networking.domain;
+    listeners = [
+      {
+        port = 8008;
+        bind_address = &quot;::1&quot;;
+        type = &quot;http&quot;;
+        tls = false;
+        x_forwarded = true;
+        resources = [
+          { names = [ &quot;client&quot; &quot;federation&quot; ]; compress = false; }
+        ];
+      }
+    ];
+  };
+};
+</pre></div>
+</div>
+<p>If the A and AAAA DNS records on
+<code class="docutils literal notranslate"><span class="pre">example.org</span></code> do not point on the same host as the records
+for myhostname.example.org, you can easily move the
+/.well-known virtualHost section of the code to the host that
+is serving <code class="docutils literal notranslate"><span class="pre">example.org</span></code>, while the rest stays on
+<code class="docutils literal notranslate"><span class="pre">myhostname.example.org</span></code> with no other changes required.
+This pattern also allows to seamlessly move the homeserver from
+<code class="docutils literal notranslate"><span class="pre">myhostname.example.org</span></code> to
+<code class="docutils literal notranslate"><span class="pre">myotherhost.example.org</span></code> by only changing the
+/.well-known redirection target.</p>
+<p>If you want to run a server with public registration by anybody, you can
+then enable . Otherwise, or you can generate a registration secret with
+<strong class="command">pwgen -s 64 1</strong> and set it with
+. To
+create a new user or admin, run the following after you have set the secret
+and have rebuilt NixOS:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix run nixpkgs.matrix-synapse$ register_new_matrix_user -k *your-registration-shared-secret* http://localhost:8008New user localpart: *your-username*Password: Confirm password: Make admin \[no]:
+Success!
+</pre></div>
+</div>
+<p>In the example, this would create a user with the Matrix Identifier
+<code class="docutils literal notranslate"><span class="pre">&#64;your-username:example.org</span></code>. Note that the registration
+secret ends up in the nix store and therefore is world-readable by any user
+on your machine, so it makes sense to only temporarily activate the
+option until a better solution
+for NixOS is in place.</p>
+</div>
+<div class="section" id="riot-web-client">
+<span id="module-services-matrix-riot-web"></span><h2>Riot Web Client<a class="headerlink" href="#riot-web-client" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/vector-im/riot-web/">Riot Web</a> is
+the reference web client for Matrix and developed by the core team at
+matrix.org. The following snippet can be optionally added to the code before
+to complete the synapse installation with a web client served at
+<a class="reference external" href="https://riot.myhostname.example.org">https://riot.myhostname.example.org</a> and
+<a class="reference external" href="https://riot.example.org">https://riot.example.org</a>. Alternatively, you can use the hosted
+copy at <a class="reference external" href="https://riot.im/app">https://riot.im/app</a>,
+or use other web clients or native client applications. Due to the
+<code class="docutils literal notranslate"><span class="pre">/.well-known</span></code> urls set up done above, many clients should
+fill in the required connection details automatically when you enter your
+Matrix Identifier. See
+<a class="reference external" href="https://matrix.org/docs/projects/try-matrix-now.html">Try
+Matrix Now!</a> for a list of existing clients and their supported
+featureset.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">services</span><span class="o">.</span><span class="n">nginx</span><span class="o">.</span><span class="n">virtualHosts</span><span class="o">.</span><span class="s2">&quot;riot.$</span><span class="si">{fqdn}</span><span class="s2">&quot;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">enableACME</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+  <span class="n">forceSSL</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+  <span class="n">serverAliases</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;riot.$</span><span class="si">{config.networking.domain}</span><span class="s2">&quot;</span>
+  <span class="p">];</span>
+
+  <span class="n">root</span> <span class="o">=</span> <span class="n">pkgs</span><span class="o">.</span><span class="n">riot</span><span class="o">-</span><span class="n">web</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Note that the Riot developers do not recommend running Riot and your Matrix
+homeserver on the same fully-qualified domain name for security reasons. In
+the example, this means that you should not reuse the
+<code class="docutils literal notranslate"><span class="pre">myhostname.example.org</span></code> virtualHost to also serve Riot,
+but instead serve it on a different subdomain, like
+<code class="docutils literal notranslate"><span class="pre">riot.example.org</span></code> in the example. See the
+<a class="reference external" href="https://github.com/vector-im/riot-web#important-security-note">Riot
+Important Security Notes</a> for more information on this subject.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="configuration.xml.html">Configuration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config-syntax.xml.html">Configuration Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="package-mgmt.xml.html">Package Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-mgmt.xml.html">User Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file-systems.xml.html">File Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="x-windows.xml.html">X Window System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xfce.xml.html">Xfce Desktop Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="networking.xml.html">Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linux-kernel.xml.html">Linux Kernel</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profiles.xml.html">Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kubernetes.xml.html">Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="configuration.xml.html">Configuration</a><ul>
+      <li>Previous: <a href="linux-kernel.xml.html" title="previous chapter">Linux Kernel</a></li>
+      <li>Next: <a href="profiles.xml.html" title="next chapter">Profiles</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/configuration/matrix.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

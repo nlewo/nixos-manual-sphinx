@@ -1,0 +1,221 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Abstractions &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Modularity" href="modularity.xml.html" />
+    <link rel="prev" title="NixOS Configuration File" href="config-file.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="abstractions">
+<span id="sec-module-abstractions"></span><h1>Abstractions<a class="headerlink" href="#abstractions" title="Permalink to this headline">¶</a></h1>
+<p>If you find yourself repeating yourself over and over, it’s time to
+abstract. Take, for instance, this Apache HTTP Server configuration:</p>
+<pre class="literal-block">
+{
+  <a class="reference internal" href="../generated/options-db.xml.html#opt-services-httpd-virtualhosts"><span class="std std-ref">services.httpd.virtualHosts</span></a>  =
+    { &quot;blog.example.org&quot; = {
+        documentRoot = &quot;/webroot/blog.example.org&quot;;
+        adminAddr = &quot;<a class="reference external" href="mailto:alice&#37;&#52;&#48;example&#46;org">alice<span>&#64;</span>example<span>&#46;</span>org</a>&quot;;
+        forceSSL = true;
+        enableACME = true;
+        enablePHP = true;
+      };
+      &quot;wiki.example.org&quot; = {
+        documentRoot = &quot;/webroot/wiki.example.org&quot;;
+        adminAddr = &quot;<a class="reference external" href="mailto:alice&#37;&#52;&#48;example&#46;org">alice<span>&#64;</span>example<span>&#46;</span>org</a>&quot;;
+        forceSSL = true;
+        enableACME = true;
+        enablePHP = true;
+      };
+    };
+}
+</pre>
+<p>It defines two virtual hosts with nearly identical configuration; the only
+difference is the document root directories. To prevent this
+duplication, we can use a <code class="docutils literal notranslate"><span class="pre">let</span></code>:</p>
+<pre class="literal-block">
+let
+  commonConfig =
+    { adminAddr = &quot;<a class="reference external" href="mailto:alice&#37;&#52;&#48;example&#46;org">alice<span>&#64;</span>example<span>&#46;</span>org</a>&quot;;
+      forceSSL = true;
+      enableACME = true;
+    };
+in
+{
+  <a class="reference internal" href="../generated/options-db.xml.html#opt-services-httpd-virtualhosts"><span class="std std-ref">services.httpd.virtualHosts</span></a>  =
+    { &quot;blog.example.org&quot; = (commonConfig // { documentRoot = &quot;/webroot/blog.example.org&quot;; });
+      &quot;wiki.example.org&quot; = (commonConfig // { documentRoot = &quot;/webroot/wiki.example.com&quot;; });
+    };
+}
+</pre>
+<p>The <code class="docutils literal notranslate"><span class="pre">let</span> <span class="pre">commonConfig</span> <span class="pre">=</span> <span class="pre">*...*</span></code>
+defines a variable named <code class="docutils literal notranslate"><span class="pre">commonConfig</span></code>. The
+<code class="docutils literal notranslate"><span class="pre">//</span></code> operator merges two attribute sets, so the
+configuration of the second virtual host is the set
+<code class="docutils literal notranslate"><span class="pre">commonConfig</span></code> extended with the document root option.</p>
+<p>You can write a <code class="docutils literal notranslate"><span class="pre">let</span></code> wherever an expression is allowed.
+Thus, you also could have written:</p>
+<pre class="literal-block">
+{
+  <a class="reference internal" href="../generated/options-db.xml.html#opt-services-httpd-virtualhosts"><span class="std std-ref">services.httpd.virtualHosts</span></a>  =
+    let commonConfig = <em>...</em>; in
+    { &quot;blog.example.org&quot; = (commonConfig // { <em>...</em>  })
+      &quot;wiki.example.org&quot; = (commonConfig // { <em>...</em>  })
+    };
+}
+</pre>
+<p>but not <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">let</span> <span class="pre">commonConfig</span> <span class="pre">=</span> <span class="pre">*...*;</span> <span class="pre">in</span>
+<span class="pre">*...*;</span> <span class="pre">}</span></code> since attributes (as opposed to
+attribute values) are not expressions.</p>
+<p><em>Functions</em> provide another method of abstraction. For
+instance, suppose that we want to generate lots of different virtual hosts,
+all with identical configuration except for the document root. This can be done
+as follows:</p>
+<pre class="literal-block">
+{
+  <a class="reference internal" href="../generated/options-db.xml.html#opt-services-httpd-virtualhosts"><span class="std std-ref">services.httpd.virtualHosts</span></a>  =
+    let
+      makeVirtualHost = webroot:
+        { documentRoot = webroot;
+          adminAddr = &quot;<a class="reference external" href="mailto:alice&#37;&#52;&#48;example&#46;org">alice<span>&#64;</span>example<span>&#46;</span>org</a>&quot;;
+          forceSSL = true;
+          enableACME = true;
+        };
+    in
+      { &quot;example.org&quot; = (makeVirtualHost &quot;/webroot/example.org&quot;);
+        &quot;example.com&quot; = (makeVirtualHost &quot;/webroot/example.com&quot;);
+        &quot;example.gov&quot; = (makeVirtualHost &quot;/webroot/example.gov&quot;);
+        &quot;example.nl&quot; = (makeVirtualHost &quot;/webroot/example.nl&quot;);
+      };
+}
+</pre>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">makeVirtualHost</span></code> is a function that takes a single
+argument <code class="docutils literal notranslate"><span class="pre">webroot</span></code> and returns the configuration for a virtual
+host. That function is then called for several names to produce the list of
+virtual host configurations.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="configuration.xml.html">Configuration</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="config-syntax.xml.html">Configuration Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="package-mgmt.xml.html">Package Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-mgmt.xml.html">User Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file-systems.xml.html">File Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="x-windows.xml.html">X Window System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xfce.xml.html">Xfce Desktop Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="networking.xml.html">Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linux-kernel.xml.html">Linux Kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix.xml.html">Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profiles.xml.html">Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kubernetes.xml.html">Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="configuration.xml.html">Configuration</a><ul>
+  <li><a href="config-syntax.xml.html">Configuration Syntax</a><ul>
+      <li>Previous: <a href="config-file.xml.html" title="previous chapter">NixOS Configuration File</a></li>
+      <li>Next: <a href="modularity.xml.html" title="next chapter">Modularity</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/configuration/abstractions.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

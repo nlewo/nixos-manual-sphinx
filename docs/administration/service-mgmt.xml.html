@@ -1,0 +1,184 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Service Management &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Rebooting and Shutting Down" href="rebooting.xml.html" />
+    <link rel="prev" title="Administration" href="running.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="service-management">
+<span id="sec-systemctl"></span><h1>Service Management<a class="headerlink" href="#service-management" title="Permalink to this headline">¶</a></h1>
+<p>In NixOS, all system services are started and monitored using the systemd
+program. Systemd is the “init” process of the system (i.e. PID 1), the
+parent of all other processes. It manages a set of so-called “units”,
+which can be things like system services (programs), but also mount points,
+swap files, devices, targets (groups of units) and more. Units can have
+complex dependencies; for instance, one unit can require that another unit
+must be successfully started before the first unit can be started. When the
+system boots, it starts a unit named <code class="docutils literal notranslate"><span class="pre">default.target</span></code>; the
+dependencies of this unit cause all system services to be started, file
+systems to be mounted, swap files to be activated, and so on.</p>
+<p>The command <strong class="command">systemctl</strong> is the main way to interact with
+<strong class="command">systemd</strong>. Without any arguments, it shows the status of
+active units:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ systemctl
+-.mount          loaded active mounted   /
+swapfile.swap    loaded active active    /swapfile
+sshd.service     loaded active running   SSH Daemon
+graphical.target loaded active active    Graphical Interface*...*
+</pre></div>
+</div>
+<p>You can ask for detailed status information about a unit, for instance, the
+PostgreSQL database service:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ systemctl status postgresql.service
+postgresql.service - PostgreSQL Server
+Loaded: loaded (/nix/store/pn3q73mvh75gsrl8w7fdlfk3fq5qm5mw-unit/postgresql.service)
+Active: active (running) since Mon, 2013-01-07 15:55:57 CET; 9h ago
+Main PID: 2390 (postgres)
+CGroup: name=systemd:/system/postgresql.service
+├─2390 postgres
+├─2418 postgres: writer process
+├─2419 postgres: wal writer process
+├─2420 postgres: autovacuum launcher process
+├─2421 postgres: stats collector process
+└─2498 postgres: zabbix zabbix \[local] idle
+
+Jan 07 15:55:55 hagbard postgres[2394]: \[1-1] LOG:  database system was shut down at 2013-01-07 15:55:05 CET
+Jan 07 15:55:57 hagbard postgres[2390]: \[1-1] LOG:  database system is ready to accept connections
+Jan 07 15:55:57 hagbard postgres[2420]: \[1-1] LOG:  autovacuum launcher started
+Jan 07 15:55:57 hagbard systemd[1]: Started PostgreSQL Server.
+</pre></div>
+</div>
+<p>Note that this shows the status of the unit (active and running), all the
+processes belonging to the service, as well as the most recent log messages
+from the service.</p>
+<p>Units can be stopped, started or restarted:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># systemctl stop postgresql.service</span>
+<span class="c1"># systemctl start postgresql.service</span>
+<span class="c1"># systemctl restart postgresql.service</span>
+</pre></div>
+</div>
+<p>These operations are synchronous: they wait until the service has finished
+starting or stopping (or has failed). Starting a unit will cause the
+dependencies of that unit to be started as well (if necessary).</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="running.xml.html">Administration</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Service Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rebooting.xml.html">Rebooting and Shutting Down</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-sessions.xml.html">User Sessions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-groups.xml.html">Control Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.xml.html">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cleaning-store.xml.html">Cleaning the Nix Store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="containers.xml.html">Container Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.xml.html">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="running.xml.html">Administration</a><ul>
+      <li>Previous: <a href="running.xml.html" title="previous chapter">Administration</a></li>
+      <li>Next: <a href="rebooting.xml.html" title="next chapter">Rebooting and Shutting Down</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/administration/service-mgmt.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

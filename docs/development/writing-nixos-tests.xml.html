@@ -1,0 +1,355 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Writing Tests &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Running Tests" href="running-nixos-tests.xml.html" />
+    <link rel="prev" title="NixOS Tests" href="nixos-tests.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="writing-tests">
+<span id="sec-writing-nixos-tests"></span><h1>Writing Tests<a class="headerlink" href="#writing-tests" title="Permalink to this headline">¶</a></h1>
+<p>A NixOS test is a Nix expression that has the following structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>import ./make-test-python.nix {
+
+  # Either the configuration of a single machine:
+  machine =
+    { config, pkgs, ... }:
+    { *configuration…*
+    };
+
+  # Or a set of machines:
+  nodes =
+    { *machine1*  =
+        { config, pkgs, ... }: { *…*  };
+      *machine2*  =
+        { config, pkgs, ... }: { *…*  };
+      …
+    };
+
+  testScript =
+    &#39;&#39;
+      *Python code…*
+    &#39;&#39;;
+}
+</pre></div>
+</div>
+<p>The attribute <code class="docutils literal notranslate"><span class="pre">testScript</span></code> is a bit of Python code that
+executes the test (described below). During the test, it will start one or
+more virtual machines, the configuration of which is described by the
+attribute <code class="docutils literal notranslate"><span class="pre">machine</span></code> (if you need only one machine in your
+test) or by the attribute <code class="docutils literal notranslate"><span class="pre">nodes</span></code> (if you need multiple
+machines). For instance,
+<a class="reference external" href="https://github.com/NixOS/nixpkgs/blob/master/nixos/tests/login.nix">login.nix</a>
+only needs a single machine to test whether users can log in on the virtual
+console, whether device ownership is correctly maintained when switching
+between consoles, and so on. On the other hand,
+<a class="reference external" href="https://github.com/NixOS/nixpkgs/blob/master/nixos/tests/nfs.nix">nfs.nix</a>,
+which tests NFS client and server functionality in the Linux kernel
+(including whether locks are maintained across server crashes), requires
+three machines: a server and two clients.</p>
+<p>There are a few special NixOS configuration options for test VMs:</p>
+<div class="section" id="virtualisation-memorysize">
+<span id="none"></span><h2>virtualisation.memorySize<a class="headerlink" href="#virtualisation-memorysize" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>The memory of the VM in megabytes.</div></blockquote>
+</div>
+<div class="section" id="virtualisation-vlans">
+<span id="id1"></span><h2>virtualisation.vlans<a class="headerlink" href="#virtualisation-vlans" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>The virtual networks to which the VM is connected. See
+<a class="reference external" href="https://github.com/NixOS/nixpkgs/blob/master/nixos/tests/nat.nix">nat.nix</a>
+for an example.</div></blockquote>
+</div>
+<div class="section" id="virtualisation-writablestore">
+<span id="id2"></span><h2>virtualisation.writableStore<a class="headerlink" href="#virtualisation-writablestore" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>By default, the Nix store in the VM is not writable. If you enable this
+option, a writable union file system is mounted on top of the Nix store
+to make it appear writable. This is necessary for tests that run Nix
+operations that modify the store.</div></blockquote>
+<p>For more options, see the module
+<a class="reference external" href="https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/virtualisation/qemu-vm.nix">qemu-vm.nix</a>.</p>
+<p>The test script is a sequence of Python statements that perform various
+actions, such as starting VMs, executing commands in the VMs, and so on. Each
+virtual machine is represented as an object stored in the variable
+<code class="docutils literal notranslate"><span class="pre">*name*</span></code> if this is also the
+identifier of the machine in the declarative config.
+If you didn’t specify multiple machines using the <code class="docutils literal notranslate"><span class="pre">nodes</span></code>
+attribute, it is just <code class="docutils literal notranslate"><span class="pre">machine</span></code>.
+The following example starts the machine, waits until it has finished booting,
+then executes a command and checks that the output is more-or-less correct:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">machine</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="n">machine</span><span class="o">.</span><span class="n">wait_for_unit</span><span class="p">(</span><span class="s2">&quot;default.target&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;Linux&quot;</span> <span class="ow">in</span> <span class="n">machine</span><span class="o">.</span><span class="n">succeed</span><span class="p">(</span><span class="s2">&quot;uname&quot;</span><span class="p">):</span>
+  <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Wrong OS&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first line is actually unnecessary; machines are implicitly started when
+you first execute an action on them (such as <code class="docutils literal notranslate"><span class="pre">wait_for_unit</span></code>
+or <code class="docutils literal notranslate"><span class="pre">succeed</span></code>). If you have multiple machines, you can speed
+up the test by starting them in parallel:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">start_all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The following methods are available on machine objects:</p>
+<p>start</p>
+<blockquote>
+<div>Start the virtual machine. This method is asynchronous — it does not
+wait for the machine to finish booting.</div></blockquote>
+<p>shutdown</p>
+<blockquote>
+<div>Shut down the machine, waiting for the VM to exit.</div></blockquote>
+<p>crash</p>
+<blockquote>
+<div>Simulate a sudden power failure, by telling the VM to exit immediately.</div></blockquote>
+<p>block</p>
+<blockquote>
+<div>Simulate unplugging the Ethernet cable that connects the machine to the
+other machines.</div></blockquote>
+<p>unblock</p>
+<blockquote>
+<div>Undo the effect of block.</div></blockquote>
+<p>screenshot</p>
+<blockquote>
+<div>Take a picture of the display of the virtual machine, in PNG format. The
+screenshot is linked from the HTML log.</div></blockquote>
+<p>get_screen_text</p>
+<blockquote>
+<div><p>Return a textual representation of what is currently visible on the
+machine’s screen using optical character recognition.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This requires passing to the test attribute
+set.</p>
+</div>
+</div></blockquote>
+<p>send_monitor_command</p>
+<blockquote>
+<div>Send a command to the QEMU monitor. This is rarely used, but allows doing
+stuff such as attaching virtual USB disks to a running machine.</div></blockquote>
+<p>send_keys</p>
+<blockquote>
+<div>Simulate pressing keys on the virtual keyboard, e.g.,
+<code class="docutils literal notranslate"><span class="pre">send_keys(&quot;ctrl-alt-delete&quot;)</span></code>.</div></blockquote>
+<p>send_chars</p>
+<blockquote>
+<div>Simulate typing a sequence of characters on the virtual keyboard, e.g.,
+<code class="docutils literal notranslate"><span class="pre">send_keys(&quot;foobar\\n&quot;)</span></code> will type the string
+<code class="docutils literal notranslate"><span class="pre">foobar</span></code> followed by the Enter key.</div></blockquote>
+<p>execute</p>
+<blockquote>
+<div>Execute a shell command, returning a list
+<code class="docutils literal notranslate"><span class="pre">(*status*,</span>
+<span class="pre">*stdout*)</span></code>.</div></blockquote>
+<p>succeed</p>
+<blockquote>
+<div>Execute a shell command, raising an exception if the exit status is not
+zero, otherwise returning the standard output.</div></blockquote>
+<p>fail</p>
+<blockquote>
+<div>Like succeed, but raising an exception if the
+command returns a zero status.</div></blockquote>
+<p>wait_until_succeeds</p>
+<blockquote>
+<div>Repeat a shell command with 1-second intervals until it succeeds.</div></blockquote>
+<p>wait_until_fails</p>
+<blockquote>
+<div>Repeat a shell command with 1-second intervals until it fails.</div></blockquote>
+<p>wait_for_unit</p>
+<blockquote>
+<div>Wait until the specified systemd unit has reached the “active” state.</div></blockquote>
+<p>wait_for_file</p>
+<blockquote>
+<div>Wait until the specified file exists.</div></blockquote>
+<p>wait_for_open_port</p>
+<blockquote>
+<div>Wait until a process is listening on the given TCP port (on
+<code class="docutils literal notranslate"><span class="pre">localhost</span></code>, at least).</div></blockquote>
+<p>wait_for_closed_port</p>
+<blockquote>
+<div>Wait until nobody is listening on the given TCP port.</div></blockquote>
+<p>wait_for_x</p>
+<blockquote>
+<div>Wait until the X11 server is accepting connections.</div></blockquote>
+<p>wait_for_text</p>
+<blockquote>
+<div><p>Wait until the supplied regular expressions matches the textual contents
+of the screen by using optical character recognition (see
+get_screen_text).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This requires passing to the test attribute
+set.</p>
+</div>
+</div></blockquote>
+<p>wait_for_window</p>
+<blockquote>
+<div>Wait until an X11 window has appeared whose name matches the given
+regular expression, e.g., <code class="docutils literal notranslate"><span class="pre">wait_for_window(&quot;Terminal&quot;)</span></code>.</div></blockquote>
+<p>copy_file_from_host</p>
+<blockquote>
+<div><p>Copies a file from host to machine, e.g.,
+<code class="docutils literal notranslate"><span class="pre">copy_file_from_host(&quot;myfile&quot;,</span> <span class="pre">&quot;/etc/my/important/file&quot;)</span></code>.</p>
+<p>The first argument is the file on the host. The file needs to be
+accessible while building the nix derivation. The second argument is the
+location of the file on the machine.</p>
+</div></blockquote>
+<p>systemctl</p>
+<blockquote>
+<div><p>Runs <code class="docutils literal notranslate"><span class="pre">systemctl</span></code> commands with optional support for
+<code class="docutils literal notranslate"><span class="pre">systemctl</span> <span class="pre">--user</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">machine</span><span class="o">.</span><span class="n">systemctl</span><span class="p">(</span><span class="s2">&quot;list-jobs --no-pager&quot;</span><span class="p">)</span> <span class="c1"># runs `systemctl list-jobs --no-pager`</span>
+<span class="n">machine</span><span class="o">.</span><span class="n">systemctl</span><span class="p">(</span><span class="s2">&quot;list-jobs --no-pager&quot;</span><span class="p">,</span> <span class="s2">&quot;any-user&quot;</span><span class="p">)</span> <span class="c1"># spawns a shell for `any-user` and runs `systemctl --user list-jobs --no-pager`</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>To test user units declared by <code class="docutils literal notranslate"><span class="pre">systemd.user.services</span></code> the
+optional <code class="docutils literal notranslate"><span class="pre">user</span></code> argument can be used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">machine</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="n">machine</span><span class="o">.</span><span class="n">wait_for_x</span><span class="p">()</span>
+<span class="n">machine</span><span class="o">.</span><span class="n">wait_for_unit</span><span class="p">(</span><span class="s2">&quot;xautolock.service&quot;</span><span class="p">,</span> <span class="s2">&quot;x-session-user&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This applies to <code class="docutils literal notranslate"><span class="pre">systemctl</span></code>, <code class="docutils literal notranslate"><span class="pre">get_unit_info</span></code>,
+<code class="docutils literal notranslate"><span class="pre">wait_for_unit</span></code>, <code class="docutils literal notranslate"><span class="pre">start_job</span></code> and
+<code class="docutils literal notranslate"><span class="pre">stop_job</span></code>.</p>
+<p>For faster dev cycles it’s also possible to disable the code-linters (this shouldn’t
+be commited though):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>import ./make-test-python.nix {
+  skipLint = true;
+  machine =
+    { config, pkgs, ... }:
+    { *configuration…*
+    };
+
+  testScript =
+    &#39;&#39;
+      *Python code…*
+    &#39;&#39;;
+}
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="development.xml.html">Development</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sources.xml.html">Getting the Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-modules.xml.html">Writing NixOS Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building-parts.xml.html">Building Specific Parts of NixOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writing-documentation.xml.html">Writing NixOS Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building-nixos.xml.html">Building Your Own NixOS CD</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="nixos-tests.xml.html">NixOS Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing-installer.xml.html">Testing the Installer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="releases.xml.html">Releases</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="development.xml.html">Development</a><ul>
+  <li><a href="nixos-tests.xml.html">NixOS Tests</a><ul>
+      <li>Previous: <a href="nixos-tests.xml.html" title="previous chapter">NixOS Tests</a></li>
+      <li>Next: <a href="running-nixos-tests.xml.html" title="next chapter">Running Tests</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/development/writing-nixos-tests.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

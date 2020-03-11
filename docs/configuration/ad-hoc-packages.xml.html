@@ -1,0 +1,175 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Ad-Hoc Package Management &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="User Management" href="user-mgmt.xml.html" />
+    <link rel="prev" title="Adding Custom Packages" href="adding-custom-packages.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="ad-hoc-package-management">
+<span id="sec-ad-hoc-packages"></span><h1>Ad-Hoc Package Management<a class="headerlink" href="#ad-hoc-package-management" title="Permalink to this headline">¶</a></h1>
+<p>With the command <strong class="command">nix-env</strong>, you can install and uninstall
+packages from the command line. For instance, to install Mozilla Thunderbird:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-env -iA nixos.thunderbird
+</pre></div>
+</div>
+<p>If you invoke this as root, the package is installed in the Nix profile
+<code class="file docutils literal notranslate"><span class="pre">/nix/var/nix/profiles/default</span></code> and visible to all users
+of the system; otherwise, the package ends up in
+<code class="file docutils literal notranslate"><span class="pre">/nix/var/nix/profiles/per-user/</span></code>
+and is not visible to other users. The flag specifies the
+package by its attribute name; without it, the package is installed by
+matching against its package name (e.g. <code class="docutils literal notranslate"><span class="pre">thunderbird</span></code>). The
+latter is slower because it requires matching against all available Nix
+packages, and is ambiguous if there are multiple matching packages.</p>
+<p>Packages come from the NixOS channel. You typically upgrade a package by
+updating to the latest version of the NixOS channel:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-channel --update nixos
+</pre></div>
+</div>
+<p>and then running <code class="docutils literal notranslate"><span class="pre">nix-env</span> <span class="pre">-i</span></code> again. Other packages in the
+profile are <em>not</em> affected; this is the crucial difference
+with the declarative style of package management, where running
+<strong class="command">nixos-rebuild switch</strong> causes all packages to be updated to
+their current versions in the NixOS channel. You can however upgrade all
+packages for which there is a newer version by doing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-env -u &#39;\*&#39;
+</pre></div>
+</div>
+<p>A package can be uninstalled using the flag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-env -e thunderbird
+</pre></div>
+</div>
+<p>Finally, you can roll back an undesirable <strong class="command">nix-env</strong> action:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nix-env --rollback
+</pre></div>
+</div>
+<p><strong class="command">nix-env</strong> has many more flags. For details, see the</p>
+<p>nix-env
+1 manpage or the Nix manual.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="configuration.xml.html">Configuration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config-syntax.xml.html">Configuration Syntax</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="package-mgmt.xml.html">Package Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-mgmt.xml.html">User Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file-systems.xml.html">File Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="x-windows.xml.html">X Window System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="xfce.xml.html">Xfce Desktop Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="networking.xml.html">Networking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="linux-kernel.xml.html">Linux Kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="matrix.xml.html">Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profiles.xml.html">Profiles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kubernetes.xml.html">Kubernetes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="configuration.xml.html">Configuration</a><ul>
+  <li><a href="package-mgmt.xml.html">Package Management</a><ul>
+      <li>Previous: <a href="adding-custom-packages.xml.html" title="previous chapter">Adding Custom Packages</a></li>
+      <li>Next: <a href="user-mgmt.xml.html" title="next chapter">User Management</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/configuration/ad-hoc-packages.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

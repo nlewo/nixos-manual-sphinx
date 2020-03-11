@@ -1,0 +1,228 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Imperative Container Management &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Declarative Container Specification" href="declarative-containers.xml.html" />
+    <link rel="prev" title="Container Management" href="containers.xml.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="imperative-container-management">
+<span id="sec-imperative-containers"></span><h1>Imperative Container Management<a class="headerlink" href="#imperative-container-management" title="Permalink to this headline">¶</a></h1>
+<p>We’ll cover imperative container management using
+<strong class="command">nixos-container</strong> first. Be aware that container management
+is currently only possible as <code class="docutils literal notranslate"><span class="pre">root</span></code>.</p>
+<p>You create a container with identifier <code class="docutils literal notranslate"><span class="pre">foo</span></code> as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nixos-container create foo</span>
+</pre></div>
+</div>
+<p>This creates the container’s root directory in
+<code class="file docutils literal notranslate"><span class="pre">/var/lib/containers/foo</span></code> and a small configuration file
+in <code class="file docutils literal notranslate"><span class="pre">/etc/containers/foo.conf</span></code>. It also builds the
+container’s initial system configuration and stores it in
+<code class="file docutils literal notranslate"><span class="pre">/nix/var/nix/profiles/per-container/foo/system</span></code>. You can
+modify the initial configuration of the container on the command line. For
+instance, to create a container that has <strong class="command">sshd</strong> running,
+with the given public key for <code class="docutils literal notranslate"><span class="pre">root</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># nixos-container create foo --config &#39;
+:ref:`opt-services.openssh.enable` = true;
+`users.users.root.openssh.authorizedKeys.keys &lt;None&gt;`_ = \[&quot;ssh-dss AAAAB3N…&quot;];
+&#39;
+</pre></div>
+</div>
+<p>By default the next free address in the <code class="docutils literal notranslate"><span class="pre">10.233.0.0/16</span></code> subnet will be chosen
+as container IP. This behavior can be altered by setting <code class="docutils literal notranslate"><span class="pre">--host-address</span></code> and
+<code class="docutils literal notranslate"><span class="pre">--local-address</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nixos-container create test --config-file test-container.nix \\</span>
+<span class="o">--</span><span class="n">local</span><span class="o">-</span><span class="n">address</span> <span class="mf">10.235</span><span class="o">.</span><span class="mf">1.2</span> <span class="o">--</span><span class="n">host</span><span class="o">-</span><span class="n">address</span> <span class="mf">10.235</span><span class="o">.</span><span class="mf">1.1</span>
+</pre></div>
+</div>
+<p>Creating a container does not start it. To start the container, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nixos-container start foo</span>
+</pre></div>
+</div>
+<p>This command will return as soon as the container has booted and has reached
+<code class="docutils literal notranslate"><span class="pre">multi-user.target</span></code>. On the host, the container runs within
+a systemd unit called
+<code class="docutils literal notranslate"><span class="pre">container&#64;*container-name*.service</span></code>.
+Thus, if something went wrong, you can get status info using
+<strong class="command">systemctl</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># systemctl status container@foo</span>
+</pre></div>
+</div>
+<p>If the container has started successfully, you can log in as root using the
+<strong class="command">root-login</strong> operation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nixos-container root-login foo</span>
+\<span class="p">[</span><span class="n">root</span><span class="nd">@foo</span><span class="p">:</span><span class="o">~</span><span class="p">]</span><span class="c1">#</span>
+</pre></div>
+</div>
+<p>Note that only root on the host can do this (since there is no
+authentication). You can also get a regular login prompt using the
+<strong class="command">login</strong> operation, which is available to all users on the
+host:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nixos-container login foo</span>
+<span class="n">foo</span> <span class="n">login</span><span class="p">:</span> <span class="n">alice</span>
+<span class="n">Password</span><span class="p">:</span> \<span class="o">***</span>
+</pre></div>
+</div>
+<p>With <strong class="command">nixos-container run</strong>, you can execute arbitrary
+commands in the container:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nixos-container run foo -- uname -a</span>
+<span class="n">Linux</span> <span class="n">foo</span> <span class="mf">3.4</span><span class="o">.</span><span class="mi">82</span> <span class="c1">#1-NixOS SMP Thu Mar 20 14:44:05 UTC 2014 x86_64 GNU/Linux</span>
+</pre></div>
+</div>
+<p>There are several ways to change the configuration of the container. First,
+on the host, you can edit
+<code class="docutils literal notranslate"><span class="pre">/var/lib/container/*name*/etc/nixos/configuration.nix</span></code>,
+and run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nixos-container update foo</span>
+</pre></div>
+</div>
+<p>This will build and activate the new configuration. You can also specify a
+new configuration on the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># nixos-container update foo --config &#39;
+:ref:`opt-services.httpd.enable` = true;
+:ref:`opt-services.httpd.adminAddr` = &quot;foo@example.org&quot;;
+:ref:`opt-networking.firewall.allowedTCPPorts` = [ 80 ];
+&#39;
+
+# curl http://$(nixos-container show-ip foo)/
+&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 3.2 Final//EN&quot;&gt;…
+</pre></div>
+</div>
+<p>However, note that this will overwrite the container’s
+<code class="file docutils literal notranslate"><span class="pre">/etc/nixos/configuration.nix</span></code>.</p>
+<p>Alternatively, you can change the configuration from within the container
+itself by running <strong class="command">nixos-rebuild switch</strong> inside the
+container. Note that the container by default does not have a copy of the
+NixOS channel, so you should run <strong class="command">nix-channel --update</strong>
+first.</p>
+<p>Containers can be stopped and started using <code class="docutils literal notranslate"><span class="pre">nixos-container</span>
+<span class="pre">stop</span></code> and <code class="docutils literal notranslate"><span class="pre">nixos-container</span> <span class="pre">start</span></code>, respectively, or
+by using <strong class="command">systemctl</strong> on the container’s service unit. To
+destroy a container, including its file system, do</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># nixos-container destroy foo</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="running.xml.html">Administration</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="service-mgmt.xml.html">Service Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rebooting.xml.html">Rebooting and Shutting Down</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-sessions.xml.html">User Sessions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="control-groups.xml.html">Control Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.xml.html">Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cleaning-store.xml.html">Cleaning the Nix Store</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="containers.xml.html">Container Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.xml.html">Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="running.xml.html">Administration</a><ul>
+  <li><a href="containers.xml.html">Container Management</a><ul>
+      <li>Previous: <a href="containers.xml.html" title="previous chapter">Container Management</a></li>
+      <li>Next: <a href="declarative-containers.xml.html" title="next chapter">Declarative Container Specification</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/administration/imperative-containers.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,437 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Release 16.03 (“Emu”, 2016/03/31) &#8212; NixOS Manual  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="release-16-03-emu-2016-03-31">
+<span id="sec-release-16-03"></span><h1>Release 16.03 (“Emu”, 2016/03/31)<a class="headerlink" href="#release-16-03-emu-2016-03-31" title="Permalink to this headline">¶</a></h1>
+<p>In addition to numerous new and upgraded packages, this release has the
+following highlights:</p>
+<ul class="simple">
+<li>Systemd 229, bringing
+<a class="reference external" href="https://github.com/systemd/systemd/blob/v229/NEWS">numerous
+improvements</a> over 217.</li>
+<li>Linux 4.4 (was 3.18).</li>
+<li>GCC 5.3 (was 4.9). Note that GCC 5
+<a class="reference external" href="https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html">changes
+the C++ ABI in an incompatible way</a>; this may cause problems if you
+try to link objects compiled with different versions of GCC.</li>
+<li>Glibc 2.23 (was 2.21).</li>
+<li>Binutils 2.26 (was 2.23.1). See #909</li>
+<li>Improved support for ensuring
+<a class="reference external" href="https://reproducible-builds.org/">bitwise
+reproducible builds</a>. For example, <code class="docutils literal notranslate"><span class="pre">stdenv</span></code> now sets
+the environment variable
+SOURCE_DATE_EPOCH
+to a deterministic value, and Nix has
+<a class="reference external" href="http://nixos.org/nix/manual/#ssec-relnotes-1.11">gained
+an option</a> to repeat a build a number of times to test determinism.
+An ongoing project, the goal of exact reproducibility is to allow binaries
+to be verified independently (e.g., a user might only trust binaries that
+appear in three independent binary caches).</li>
+<li>Perl 5.22.</li>
+</ul>
+<p>The following new services were added since the last release:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/longview.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">hardware/video/webcam/facetimehd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">i18n/input-method/default.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">i18n/input-method/fcitx.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">i18n/input-method/ibus.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">i18n/input-method/nabi.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">i18n/input-method/uim.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">programs/fish.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">security/acme.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">security/audit.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">security/oath.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/hardware/irqbalance.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/mail/dspam.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/mail/opendkim.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/mail/postsrsd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/mail/rspamd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/mail/rmilter.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/autofs.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/bepasty.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/calibre-server.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/cfdyndns.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/gammu-smsd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/mathics.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/matrix-synapse.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/misc/octoprint.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/hdaps.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/heapster.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/monitoring/longview.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/network-filesystems/netatalk.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/network-filesystems/xtreemfs.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/autossh.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/dnschain.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/gale.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/miniupnpd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/namecoind.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/ostinato.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/pdnsd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/shairport-sync.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/networking/supplicant.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/search/kibana.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/security/haka.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/security/physlock.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/web-apps/pump.io.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/x11/hardware/libinput.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">services/x11/window-managers/windowlab.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">system/boot/initrd-network.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">system/boot/initrd-ssh.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">system/boot/loader/loader.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">system/boot/networkd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">system/boot/resolved.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">virtualisation/lxd.nix</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">virtualisation/rkt.nix</span></code></li>
+</ul>
+<p>When upgrading from a previous release, please be aware of the following
+incompatible changes:</p>
+<ul>
+<li><p class="first">We no longer produce graphical ISO images and VirtualBox images for
+<code class="docutils literal notranslate"><span class="pre">i686-linux</span></code>. A minimal ISO image is still provided.</p>
+</li>
+<li><p class="first">Firefox and similar browsers are now <em>wrapped by
+default</em>. The package and attribute names are plain
+<code class="docutils literal notranslate"><span class="pre">firefox</span></code> or <code class="docutils literal notranslate"><span class="pre">midori</span></code>, etc.
+Backward-compatibility attributes were set up, but note that
+<strong class="command">nix-env -u</strong> will <em>not</em> update your
+current <code class="docutils literal notranslate"><span class="pre">firefox-with-plugins</span></code>; you have to uninstall it
+and install <code class="docutils literal notranslate"><span class="pre">firefox</span></code> instead.</p>
+</li>
+<li><p class="first"><strong class="command">wmiiSnap</strong> has been replaced with
+<strong class="command">wmii_hg</strong>, but
+<strong class="command">services.xserver.windowManager.wmii.enable</strong> has been
+updated respectively so this only affects you if you have explicitly
+installed <strong class="command">wmiiSnap</strong>.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">jobs</span></code> NixOS option has been removed. It served as
+compatibility layer between Upstart jobs and SystemD services. All services
+have been rewritten to use <code class="docutils literal notranslate"><span class="pre">systemd.services</span></code></p>
+</li>
+<li><p class="first"><strong class="command">wmiimenu</strong> is removed, as it has been removed by the
+developers upstream. Use <strong class="command">wimenu</strong> from the
+<strong class="command">wmii-hg</strong> package.</p>
+</li>
+<li><p class="first">Gitit is no longer automatically added to the module list in NixOS and as
+such there will not be any manual entries for it. You will need to add an
+import statement to your NixOS configuration in order to use it, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="n">imports</span> <span class="o">=</span> <span class="p">[</span> <span class="o">&lt;</span><span class="n">nixpkgs</span><span class="o">/</span><span class="n">nixos</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">misc</span><span class="o">/</span><span class="n">gitit</span><span class="o">.</span><span class="n">nix</span><span class="o">&gt;</span> <span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>will include the Gitit service configuration options.</p>
+</li>
+<li><p class="first"><strong class="command">nginx</strong> does not accept flags for enabling and disabling
+modules anymore. Instead it accepts <code class="docutils literal notranslate"><span class="pre">modules</span></code> argument,
+which is a list of modules to be built in. All modules now reside in
+<code class="docutils literal notranslate"><span class="pre">nginxModules</span></code> set. Example configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nginx</span><span class="o">.</span><span class="n">override</span> <span class="p">{</span>
+  <span class="n">modules</span> <span class="o">=</span> <span class="p">[</span> <span class="n">nginxModules</span><span class="o">.</span><span class="n">rtmp</span> <span class="n">nginxModules</span><span class="o">.</span><span class="n">dav</span> <span class="n">nginxModules</span><span class="o">.</span><span class="n">moreheaders</span> <span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong class="command">s3sync</strong> is removed, as it hasn’t been developed by
+upstream for 4 years and only runs with ruby 1.8. For an actively-developer
+alternative look at <strong class="command">tarsnap</strong> and others.</p>
+</li>
+<li><p class="first"><strong class="command">ruby_1_8</strong> has been removed as it’s not supported from
+upstream anymore and probably contains security issues.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">tidy-html5</span></code> package is removed. Upstream only provided
+<code class="docutils literal notranslate"><span class="pre">(lib)tidy5</span></code> during development, and now they went back to
+<code class="docutils literal notranslate"><span class="pre">(lib)tidy</span></code> to work as a drop-in replacement of the
+original package that has been unmaintained for years. You can (still) use
+the <code class="docutils literal notranslate"><span class="pre">html-tidy</span></code> package, which got updated to a stable
+release from this new upstream.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">extraDeviceOptions</span></code> argument is removed from
+<code class="docutils literal notranslate"><span class="pre">bumblebee</span></code> package. Instead there are now two separate
+arguments: <code class="docutils literal notranslate"><span class="pre">extraNvidiaDeviceOptions</span></code> and
+<code class="docutils literal notranslate"><span class="pre">extraNouveauDeviceOptions</span></code> for setting extra X11 options
+for nvidia and nouveau drivers, respectively.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">Ctrl+Alt+Backspace</span></code> key combination no longer kills
+the X server by default. There’s a new option
+allowing to enable
+the combination again.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">emacsPackagesNg</span></code> now contains all packages from the ELPA,
+MELPA, and MELPA Stable repositories.</p>
+</li>
+<li><p class="first">Data directory for Postfix MTA server is moved from
+<code class="file docutils literal notranslate"><span class="pre">/var/postfix</span></code> to <code class="file docutils literal notranslate"><span class="pre">/var/lib/postfix</span></code>.
+Old configurations are migrated automatically.
+<code class="docutils literal notranslate"><span class="pre">service.postfix</span></code> module has also received many
+improvements, such as correct directories’ access rights, new
+<code class="docutils literal notranslate"><span class="pre">aliasFiles</span></code> and <code class="docutils literal notranslate"><span class="pre">mapFiles</span></code> options and
+more.</p>
+</li>
+<li><p class="first">Filesystem options should now be configured as a list of strings, not a
+comma-separated string. The old style will continue to work, but print a
+warning, until the 16.09 release. An example of the new style:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fileSystems</span><span class="o">.</span><span class="s2">&quot;/example&quot;</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;/dev/sdc&quot;</span><span class="p">;</span>
+  <span class="n">fsType</span> <span class="o">=</span> <span class="s2">&quot;btrfs&quot;</span><span class="p">;</span>
+  <span class="n">options</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;noatime&quot;</span> <span class="s2">&quot;compress=lzo&quot;</span> <span class="s2">&quot;space_cache&quot;</span> <span class="s2">&quot;autodefrag&quot;</span> <span class="p">];</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">CUPS, installed by <code class="docutils literal notranslate"><span class="pre">services.printing</span></code> module, now has its
+data directory in <code class="file docutils literal notranslate"><span class="pre">/var/lib/cups</span></code>. Old configurations
+from <code class="file docutils literal notranslate"><span class="pre">/etc/cups</span></code> are moved there automatically, but
+there might be problems. Also configuration options
+<code class="docutils literal notranslate"><span class="pre">services.printing.cupsdConf</span></code> and
+<code class="docutils literal notranslate"><span class="pre">services.printing.cupsdFilesConf</span></code> were removed because
+they had been allowing one to override configuration variables required for
+CUPS to work at all on NixOS. For most use cases,
+<code class="docutils literal notranslate"><span class="pre">services.printing.extraConf</span></code> and new option
+<code class="docutils literal notranslate"><span class="pre">services.printing.extraFilesConf</span></code> should be enough; if
+you encounter a situation when they are not, please file a bug.</p>
+<p>There are also Gutenprint improvements; in particular, a new option
+<code class="docutils literal notranslate"><span class="pre">services.printing.gutenprint</span></code> is added to enable
+automatic updating of Gutenprint PPMs; it’s greatly recommended to enable
+it instead of adding <code class="docutils literal notranslate"><span class="pre">gutenprint</span></code> to the
+<code class="docutils literal notranslate"><span class="pre">drivers</span></code> list.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">services.xserver.vaapiDrivers</span></code> has been removed. Use
+<code class="docutils literal notranslate"><span class="pre">hardware.opengl.extraPackages{,32}</span></code> instead. You can also
+specify VDPAU drivers there.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">programs.ibus</span></code> moved to
+<code class="docutils literal notranslate"><span class="pre">i18n.inputMethod.ibus</span></code>. The option
+<code class="docutils literal notranslate"><span class="pre">programs.ibus.plugins</span></code> changed to
+<code class="docutils literal notranslate"><span class="pre">i18n.inputMethod.ibus.engines</span></code> and the option to enable
+ibus changed from <code class="docutils literal notranslate"><span class="pre">programs.ibus.enable</span></code> to
+<code class="docutils literal notranslate"><span class="pre">i18n.inputMethod.enabled</span></code>.
+<code class="docutils literal notranslate"><span class="pre">i18n.inputMethod.enabled</span></code> should be set to the used input
+method name, <code class="docutils literal notranslate"><span class="pre">&quot;ibus&quot;</span></code> for ibus. An example of the new
+style:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">i18n</span><span class="o">.</span><span class="n">inputMethod</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="s2">&quot;ibus&quot;</span><span class="p">;</span>
+<span class="n">i18n</span><span class="o">.</span><span class="n">inputMethod</span><span class="o">.</span><span class="n">ibus</span><span class="o">.</span><span class="n">engines</span> <span class="o">=</span> <span class="k">with</span> <span class="n">pkgs</span><span class="o">.</span><span class="n">ibus</span><span class="o">-</span><span class="n">engines</span><span class="p">;</span> <span class="p">[</span> <span class="n">anthy</span> <span class="n">mozc</span> <span class="p">];</span>
+</pre></div>
+</div>
+<p>That is equivalent to the old version:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">programs</span><span class="o">.</span><span class="n">ibus</span><span class="o">.</span><span class="n">enable</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+<span class="n">programs</span><span class="o">.</span><span class="n">ibus</span><span class="o">.</span><span class="n">plugins</span> <span class="o">=</span> <span class="k">with</span> <span class="n">pkgs</span><span class="p">;</span> <span class="p">[</span> <span class="n">ibus</span><span class="o">-</span><span class="n">anthy</span> <span class="n">mozc</span> <span class="p">];</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">services.udev.extraRules</span></code> option now writes rules to
+<code class="file docutils literal notranslate"><span class="pre">99-local.rules</span></code> instead of
+<code class="file docutils literal notranslate"><span class="pre">10-local.rules</span></code>. This makes all the user rules apply
+after others, so their results wouldn’t be overriden by anything else.</p>
+</li>
+<li><p class="first">Large parts of the <code class="docutils literal notranslate"><span class="pre">services.gitlab</span></code> module has been been
+rewritten. There are new configuration options available. The
+<code class="docutils literal notranslate"><span class="pre">stateDir</span></code> option was renamned to
+<code class="docutils literal notranslate"><span class="pre">statePath</span></code> and the <code class="docutils literal notranslate"><span class="pre">satellitesDir</span></code>
+option was removed. Please review the currently available options.</p>
+</li>
+<li><p class="first">The option no longer
+interpret the dollar sign ($) as a shell variable, as such it should not be
+escaped anymore. Thus the following zone data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>\$ORIGIN example.com.
+\$TTL 1800
+@       IN      SOA     ns1.vpn.nbp.name.      admin.example.com. (
+</pre></div>
+</div>
+<p>Should modified to look like the actual file expected by nsd:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ORIGIN example.com.
+$TTL 1800
+@       IN      SOA     ns1.vpn.nbp.name.      admin.example.com. (
+</pre></div>
+</div>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">service.syncthing.dataDir</span></code> options now has to point to
+exact folder where syncthing is writing to. Example configuration should
+look something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">services</span><span class="o">.</span><span class="n">syncthing</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">enable</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+    <span class="n">dataDir</span> <span class="o">=</span> <span class="s2">&quot;/home/somebody/.syncthing&quot;</span><span class="p">;</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="s2">&quot;somebody&quot;</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">networking.firewall.allowPing</span></code> is now enabled by default.
+Users are encouraged to configure an appropriate rate limit for their
+machines using the Kernel interface at
+<code class="file docutils literal notranslate"><span class="pre">/proc/sys/net/ipv4/icmp_ratelimit</span></code> and
+<code class="file docutils literal notranslate"><span class="pre">/proc/sys/net/ipv6/icmp/ratelimit</span></code> or using the
+firewall itself, i.e. by setting the NixOS option
+<code class="docutils literal notranslate"><span class="pre">networking.firewall.pingLimit</span></code>.</p>
+</li>
+<li><p class="first">Systems with some broadcom cards used to result into a generated config
+that is no longer accepted. If you get errors like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>error: path ‘/nix/store/\*-broadcom-sta-\*’ does not exist and cannot be created
+</pre></div>
+</div>
+<p>you should either re-run <strong class="command">nixos-generate-config</strong> or
+manually replace
+<code class="docutils literal notranslate"><span class="pre">&quot;${config.boot.kernelPackages.broadcom_sta}&quot;</span></code> by
+<code class="docutils literal notranslate"><span class="pre">config.boot.kernelPackages.broadcom_sta</span></code> in your
+<code class="file docutils literal notranslate"><span class="pre">/etc/nixos/hardware-configuration.nix</span></code>. More discussion
+is on <a class="reference external" href="https://github.com/NixOS/nixpkgs/pull/12595">the
+github issue</a>.</p>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">services.xserver.startGnuPGAgent</span></code> option has been
+removed. GnuPG 2.1.x changed the way the gpg-agent works, and that new
+approach no longer requires (or even supports) the “start everything as a
+child of the agent” scheme we’ve implemented in NixOS for older versions.
+To configure the gpg-agent for your X session, add the following code to
+<code class="file docutils literal notranslate"><span class="pre">~/.bashrc</span></code> or some file that’s sourced when your
+shell is started:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>GPG_TTY=$(tty)
+export GPG_TTY
+</pre></div>
+</div>
+<p>If you want to use gpg-agent for SSH, too, add the following to your
+session initialization (e.g.
+<code class="docutils literal notranslate"><span class="pre">displayManager.sessionCommands</span></code>)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gpg</span><span class="o">-</span><span class="n">connect</span><span class="o">-</span><span class="n">agent</span> <span class="o">/</span><span class="n">bye</span>
+<span class="n">unset</span> <span class="n">SSH_AGENT_PID</span>
+<span class="n">export</span> <span class="n">SSH_AUTH_SOCK</span><span class="o">=</span><span class="s2">&quot;&#39;&#39;$</span><span class="si">{HOME}</span><span class="s2">/.gnupg/S.gpg-agent.ssh&quot;</span>
+</pre></div>
+</div>
+<p>and make sure that</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">enable</span><span class="o">-</span><span class="n">ssh</span><span class="o">-</span><span class="n">support</span>
+</pre></div>
+</div>
+<p>is included in your <code class="file docutils literal notranslate"><span class="pre">~/.gnupg/gpg-agent.conf</span></code>. You will
+need to use <strong class="command">ssh-add</strong> to re-add your ssh keys. If gpg’s
+automatic transformation of the private keys to the new format fails, you
+will need to re-import your private keyring as well:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gpg</span> <span class="o">--</span><span class="kn">import</span> <span class="o">~/.</span><span class="n">gnupg</span><span class="o">/</span><span class="n">secring</span><span class="o">.</span><span class="n">gpg</span>
+</pre></div>
+</div>
+<p>The <strong class="command">gpg-agent(1)</strong> man page has more details about this
+subject, i.e. in the “EXAMPLES” section.</p>
+</li>
+</ul>
+<p>Other notable improvements:</p>
+<ul class="simple">
+<li>&lt;listitem&gt;
+&lt;para&gt;The &lt;command&gt;command-not-found&lt;/command&gt; hook was extended.
+Apart from &lt;literal&gt;$NIX_AUTO_INSTALL&lt;/literal&gt; variable,
+it newly also checks for &lt;literal&gt;$NIX_AUTO_RUN&lt;/literal&gt;
+which causes it to directly run the missing commands via
+&lt;command&gt;nix-shell&lt;/command&gt; (without installing anything).&lt;/para&gt;
+&lt;/listitem&gt;</li>
+<li><code class="docutils literal notranslate"><span class="pre">ejabberd</span></code> module is brought back and now works on NixOS.</li>
+<li>Input method support was improved. New NixOS modules (fcitx, nabi and
+uim), fcitx engines (chewing, hangul, m17n, mozc and table-other) and ibus
+engines (hangul and m17n) have been added.</li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">NixOS Manual</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.xml.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation/installation.xml.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/configuration.xml.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../administration/running.xml.html">Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development/development.xml.html">Development</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../generated/options-db.xml.html">Configuration Options</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;1970, lewo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/release-notes/rl-1603.xml.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
